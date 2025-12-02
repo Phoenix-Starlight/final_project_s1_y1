@@ -5,7 +5,7 @@ Final Project for Programming Principles
 Design, implement, and present a program that manages student records (courses and grades) and display/export performance.
 
 # Progress
-- [ ] Flowchart
+- [x] Flowchart
 - [ ] Produce Program
 - [ ] Present
 
