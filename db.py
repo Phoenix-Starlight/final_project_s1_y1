@@ -1,9 +1,6 @@
 from dataclasses import dataclass, fields
 from os import PathLike
-from typing import TYPE_CHECKING, Protocol, TextIO, Type
-
-if TYPE_CHECKING:
-    from _typeshed import DataclassInstance
+from typing import Any, Iterable, Protocol, TextIO, Type
 
 @dataclass
 class Unique(Protocol):
