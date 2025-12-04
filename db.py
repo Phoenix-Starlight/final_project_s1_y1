@@ -1,3 +1,4 @@
+from collections import Counter
 from dataclasses import dataclass, fields
 from os import PathLike
 from typing import Any, Iterable, Protocol, TextIO, Type
@@ -26,3 +27,9 @@ class Grade(Unique):
     marks: list[int]
     letter_grade: str
     unique = ["student_id", "course_name"]
+
+def verify_table_headers(structure: Iterable[str], headers: Iterable[str]) -> bool:
+    return has_duplicate_headers(headers) or set(structure) == set(headers)
+
+def has_duplicate_headers(headers: Iterable[str]) -> bool:
+    return any(count != 1 for count in Counter(headers).values())
