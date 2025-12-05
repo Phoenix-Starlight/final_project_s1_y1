@@ -7,25 +7,25 @@ from typing import Any, Callable, Iterable, Protocol, TextIO, Type, cast
 from parser import parse_row, try_parse, validate_table
 
 
-@dataclass
+@dataclass(frozen=True)
 class Unique(Protocol):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class Student(Unique):
     id: int
     name: str
     email: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class Course(Unique):
     id: str
     name: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class Grade(Unique):
     student_id: int
     course_name: str
