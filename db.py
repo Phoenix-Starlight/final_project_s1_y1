@@ -4,7 +4,7 @@ from collections import Counter
 from dataclasses import dataclass, fields
 from os import PathLike
 from types import GenericAlias
-from typing import Any, Callable, Iterable, Protocol, TextIO, Type, TypeGuard, cast
+from typing import Any, Callable, Iterable, Protocol, TextIO, Type, cast
 
 
 @dataclass
@@ -17,14 +17,12 @@ class Student(Unique):
     id: int
     name: str
     email: str
-    unique = ["id", "email"]
 
 
 @dataclass
 class Course(Unique):
     id: str
     name: str
-    unique = ["id", "name"]
 
 
 @dataclass
@@ -33,7 +31,13 @@ class Grade(Unique):
     course_name: str
     marks: list[int]
     letter_grade: str
-    unique = ["student_id", "course_name"]
+
+
+unique_keys: dict[type, list[str]] = {
+    Student: ["id", "email"],
+    Course: ["id", "name"],
+    Grade: ["student_id", "course_name"],
+}
 
 
 def verify_table_headers(structure: Iterable[str], headers: Iterable[str]) -> bool:
@@ -120,10 +124,7 @@ class Database[T: Unique]:
     def __init__(self, file: PathLike, structure: T) -> None:
         self.type = type(structure)
         self.structure = dict(
-            filter(
-                remove_unique_attribute,
-                [(field.name, resolve_type(field.type)) for field in fields(structure)],
-            )
+            [(field.name, resolve_type(field.type)) for field in fields(structure)]
         )
         self.unique = structure.unique
         self.file = file
@@ -147,12 +148,6 @@ class Database[T: Unique]:
 
 def return_tuple(structure: Unique):
     return [(field.name, resolve_type(field.type)) for field in fields(structure)]
-
-
-def remove_unique_attribute[V](
-    dict_tuple: tuple[str, V | None],
-) -> TypeGuard[tuple[str, V]]:
-    return dict_tuple[0] != "unique" and dict_tuple[1] is not None
 
 
 def resolve_type(t: Type[Any] | str | Any) -> Callable[..., Any] | None:
