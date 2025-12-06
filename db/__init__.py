@@ -1,6 +1,5 @@
 from collections import Counter
 from dataclasses import dataclass, fields
-from os import PathLike
 from types import GenericAlias
 from typing import Any, Callable, Iterable, Protocol, Type, TypeVar, cast
 
@@ -42,7 +41,7 @@ unique_keys: dict[type, list[str]] = {
 
 
 def verify_table_headers(structure: Iterable[str], headers: Iterable[str]) -> bool:
-    return has_duplicate_headers(headers) or set(structure) == set(headers)
+    return has_duplicate_headers(headers) or set(structure) != set(headers)
 
 
 def has_duplicate_headers(headers: Iterable[str]) -> bool:
@@ -50,7 +49,7 @@ def has_duplicate_headers(headers: Iterable[str]) -> bool:
 
 
 def load_db[T](
-    path: PathLike,
+    path: str,
     constructor: Callable[..., T],
     structure: dict[str, Callable[..., Any]],
 ) -> list[T]:
@@ -84,7 +83,7 @@ def load_db[T](
 
 
 class Database[T: Unique]:
-    def __init__(self, file: PathLike, structure: Type[T]) -> None:
+    def __init__(self, file: str, structure: Type[T]) -> None:
         self.type = type(structure)
         self.structure = dict(
             [(field.name, resolve_type(field.type)) for field in fields(structure)]
@@ -112,7 +111,7 @@ class Database[T: Unique]:
     def read(self, id: tuple[str, str]):
         pass
 
-    def lazy_initialize_db(self, file: PathLike):
+    def lazy_initialize_db(self, file: str):
         with open(file, "a+") as csv:
             csv.seek(0)
             if not csv.read(1):
