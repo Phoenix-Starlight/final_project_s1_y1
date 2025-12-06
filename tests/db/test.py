@@ -30,8 +30,6 @@ def load_duplicate_data():
     db.Database("invalid-students.txt", db.Student)
 
 
-Path.unlink(Path("valid-students.txt"))
-
 students = db.Database("valid-students.txt", db.Student)
 
 id_identifier = ("id", 0)
@@ -97,3 +95,5 @@ insert_twice()
 update_unique_key()
 update_name()
 delete_jane()
+
+Path.unlink(Path("valid-students.txt"))

@@ -1,2 +1,0 @@
-id,name,email
-0,John,example@example.com
