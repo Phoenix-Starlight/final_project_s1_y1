@@ -123,11 +123,14 @@ class Database[T: Unique]:
         for k in unique_keys[self.type]:
             self._index[k][object[k]] = lambda: i
 
-    def update(self, id: tuple[str, Any], obj: T):
+    def update(self, id: tuple[str, Any], obj: T) -> bool:
+        if (record := self.read(id)) is None:
+            return False
         exceptions = [
-            ValueError(f"Modifying unique column `{k}` is disallowed")
-            for k, v in id
-            if obj[k] != v
+            ValueError(f"Modifying unique column `{f.name}` is disallowed")
+            for f in fields(obj)
+            if f.name in unique_keys[self.type]
+            if obj[f.name] != record[f.name]
         ]
         if len(exceptions) > 0:
             raise ExceptionGroup(
@@ -136,6 +139,8 @@ class Database[T: Unique]:
             )
         if ref := self._index[id[0]][id[1]]:
             self._db[ref()] = obj
+            return True
+        return False
 
     def delete(self, id: tuple[str, Any]) -> bool:
         if ref := self._index[id[0]][id[1]]:
