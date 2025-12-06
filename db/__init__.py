@@ -126,7 +126,7 @@ T = TypeVar("T", bound=Unique, covariant=True)
 IndexReference = dict[str, dict[Any, Callable[[], T]]]
 
 
-def create_indexes[T: Unique](unique_keys: list[str], db: list[T]) -> IndexReference:
+def create_indexes(unique_keys: list[str], db: list[T]) -> IndexReference:
     indexes: IndexReference = {}
     for key in unique_keys:
         indexes[key] = {}
