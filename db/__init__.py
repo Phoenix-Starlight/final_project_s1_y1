@@ -117,7 +117,7 @@ class Database[T: Unique]:
             raise TypeError(f"{object} of type {t} does not match type {self.type}")
         for k in unique_keys[self.type]:
             if (v := object[k]) in self._index[k]:
-                raise BadIndex(k, v)
+                raise BadIndex(k, v, object, self.insert)
         self._db.append(object)
         i = len(self._db) - 1
         for k in unique_keys[self.type]:
@@ -192,8 +192,10 @@ class Database[T: Unique]:
 T = TypeVar("T", bound=Unique, covariant=True)
 
 
-def BadIndex(k, v):
-    return ValueError(f"Bad index `{k}`: value `{v}` already present`")
+def BadIndex(k, v, obj, keyword: Callable):
+    return ValueError(
+        f"Bad index `{k}` attempting to {keyword.__name__} `{obj}`: value `{v}` already present`"
+    )
 
 
 def create_indexes(unique_keys: list[str], db: list[T]) -> IndexReference:
@@ -204,7 +206,7 @@ def create_index(db: list[T], key: str):
     index: Index = {}
     for i, record in enumerate(db):
         if (v := record[key]) in index:
-            raise BadIndex(key, v)
+            raise BadIndex(key, v, record, create_index)
         index[v] = lambda: (i)
     return index
 
