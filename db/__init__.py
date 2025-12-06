@@ -116,9 +116,12 @@ class Database[T: Unique]:
         if (t := type(object)) is not self.type:
             raise TypeError(f"{object} of type {t} does not match type {self.type}")
         for k in unique_keys[self.type]:
-            if (v := object[k]) in self._index[k][v]:
+            if (v := object[k]) in self._index[k]:
                 raise BadIndex(k, v)
         self._db.append(object)
+        i = len(self._db) - 1
+        for k in unique_keys[self.type]:
+            self._index[k][object[k]] = lambda: i
 
     def update(self, id: tuple[str, Any], obj: T):
         exceptions = [
