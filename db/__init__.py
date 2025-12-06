@@ -120,8 +120,8 @@ class Database[T: Unique]:
                 "Uniquness was violated",
                 exceptions,
             )
-        # Do in-place replacement of self.db;
-        pass
+        if ref := self._index[id[0]][id[1]]:
+            self._db[ref()] = obj
 
     def delete(self, id: tuple[str, Any]):
         pass
