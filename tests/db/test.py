@@ -30,9 +30,8 @@ def load_duplicate_data():
     db.Database("invalid-students.txt", db.Student)
 
 
-students = db.Database("valid-students.txt", db.Student)
-
-id_identifier = ("id", 0)
+def load_database():
+    db.Database("valid-students.txt", db.Student)
 
 
 # Not wrapped as this should not fail
@@ -88,6 +87,15 @@ def delete_jane():
         )
 
 
+load_duplicate_data()
+load_database()
+
+print("Creating students.txt")
+students = db.Database("students.txt", db.Student)
+
+id_identifier = ("id", 0)
+
+
 insert_first_record()
 load_duplicate_data()
 insert_non_unique_email()
@@ -96,4 +104,4 @@ update_unique_key()
 update_name()
 delete_jane()
 
-Path.unlink(Path("valid-students.txt"))
+Path.unlink(Path("students.txt"))
