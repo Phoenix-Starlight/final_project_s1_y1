@@ -3,8 +3,9 @@ import typing
 from typing import Any, Callable
 
 # Match content and stop at commas, and capture arrays by matching for content inbetween [] ending with a comma
+# Also capture uncaptured contents up to end of string (Catch "Y,X\n")
 # For example 1,2,2,[2],
-data_regex = r"(\[.*?\])|(.*?),"
+data_regex = r"(\[.*?\])|(.*?)(,|$)"
 
 
 def try_parse(cell_data: str, type: Callable[..., Any]):
