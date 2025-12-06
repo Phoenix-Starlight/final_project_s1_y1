@@ -13,8 +13,9 @@ def catch_and_log(x: Callable[..., Any]):
     def log():
         try:
             x()
-        except Exception:
-            traceback.print_exc()
+        except Exception as e:
+            print(e)
+            print("Task failed successfully")
 
     return log
 
