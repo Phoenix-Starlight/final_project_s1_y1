@@ -113,9 +113,11 @@ class Database[T: Unique]:
         self._fd: TextIO | None = None
 
     def insert(self, object: T):
-        if type(object) is not self.type:
-            raise TypeError()
-        # reject dups
+        if (t := type(object)) is not self.type:
+            raise TypeError(f"{object} of type {t} does not match type {self.type}")
+        for k in unique_keys[self.type]:
+            if (v := object[k]) in self._index[k][v]:
+                raise BadIndex(k, v)
         self._db.append(object)
 
     def update(self, id: tuple[str, Any], obj: T):
@@ -187,6 +189,10 @@ class Database[T: Unique]:
 T = TypeVar("T", bound=Unique, covariant=True)
 
 
+def BadIndex(k, v):
+    return ValueError(f"Bad index `{k}`: value `{v}` already present`")
+
+
 def create_indexes(unique_keys: list[str], db: list[T]) -> IndexReference:
     return {key: create_index(db, key) for key in unique_keys}
 
@@ -194,9 +200,9 @@ def create_indexes(unique_keys: list[str], db: list[T]) -> IndexReference:
 def create_index(db: list[T], key: str):
     index: Index = {}
     for i, record in enumerate(db):
-        if (value := record[key]) in index:
-            raise ValueError(f"Bad index for `{key}`: value `{index}` already present")
-        index[value] = lambda: (i)
+        if (v := record[key]) in index:
+            raise BadIndex(key, v)
+        index[v] = lambda: (i)
     return index
 
 
