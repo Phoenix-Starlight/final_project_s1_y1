@@ -100,9 +100,20 @@ class Database[T: Unique]:
     def insert(self, object: T):
         if type(object) is not self.type:
             raise TypeError()
+        # reject dups
         self._db.append(object)
 
     def update(self, id: tuple[str, Any], obj: T):
+        exceptions = [
+            ValueError(f"Modifying unique column `{k}` is disallowed")
+            for k, v in id
+            if obj[k] != v
+        ]
+        if len(exceptions) > 0:
+            raise ExceptionGroup(
+                "Uniquness was violated",
+                exceptions,
+            )
         # Do in-place replacement of self.db;
         pass
 
