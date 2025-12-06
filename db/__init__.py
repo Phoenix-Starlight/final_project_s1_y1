@@ -84,7 +84,7 @@ def load_db[T](
 
 class Database[T: Unique]:
     def __init__(self, file: str, structure: Type[T]) -> None:
-        self.type = type(structure)
+        self.type = structure
         self.structure = dict(
             [(field.name, resolve_type(field.type)) for field in fields(structure)]
         )
