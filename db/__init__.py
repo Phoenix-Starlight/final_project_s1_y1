@@ -91,16 +91,16 @@ class Database[T: Unique]:
         self.file = file
         # CLOSE FILE AFTER OPERATION: DOESN'T UPDATE
         self.initialize_db(file)
-        self.db: list[T] = load_db(file, self.type, self.structure)
-        self.index: dict[str, dict[Any, Callable[[], T]]] = dict(
-            create_indexes(unique_keys[self.type], self.db)
+        self._db: list[T] = load_db(file, self.type, self.structure)
+        self._index: dict[str, dict[Any, Callable[[], tuple[int, T]]]] = dict(
+            create_indexes(unique_keys[self.type], self._db)
         )
         self._fd: TextIO | None = None
 
     def insert(self, object: T):
         if type(object) is not self.type:
             raise TypeError()
-        self.db.append(object)
+        self._db.append(object)
 
     def update(self, id: tuple[str, Any], obj: T):
         # Do in-place replacement of self.db;
@@ -125,7 +125,7 @@ class Database[T: Unique]:
         file.writelines(
             [
                 ",".join([str(record[field.name]) for field in fields(record)])
-                for record in self.db
+                for record in self._db
             ]
         )
 
@@ -150,7 +150,7 @@ T = TypeVar("T", bound=Unique, covariant=True)
 
 # Maintain a dynamically solved reference for easy updates
 # Makes deletion harder
-IndexReference = dict[str, dict[Any, Callable[[], T]]]
+IndexReference = dict[str, dict[Any, Callable[[], tuple[int, T]]]]
 
 
 def create_indexes(unique_keys: list[str], db: list[T]) -> IndexReference:
@@ -162,7 +162,7 @@ def create_indexes(unique_keys: list[str], db: list[T]) -> IndexReference:
                 raise ValueError(
                     f"Bad index for `{key}`: value `{index}` already present"
                 )
-            indexes[key][record[key]] = lambda: db[index]
+            indexes[key][record[key]] = lambda: (index, db[index])
 
     return indexes
 
