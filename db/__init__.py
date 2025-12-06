@@ -137,21 +137,21 @@ class Database[T: Unique]:
                 "Uniquness was violated",
                 exceptions,
             )
-        if ref := self._index[id[0]][id[1]]:
-            self._db[ref()] = obj
+        if id[0] in self._index and id[1] in (index := self._index[id[0]]):
+            self._db[index[id[1]]()] = obj
             return True
         return False
 
     def delete(self, id: tuple[str, Any]) -> bool:
-        if ref := self._index[id[0]][id[1]]:
-            del self._db[ref()]
+        if id[0] in self._index and id[1] in (index := self._index[id[0]]):
+            del self._db[index[id[1]]()]
             del self._index[id[0]][id[1]]
             return True
         return False
 
     def read(self, id: tuple[str, Any]) -> T | None:
-        if ref := self._index[id[0]][id[1]]:
-            return self._db[ref()]
+        if id[0] in self._index and id[1] in (index := self._index[id[0]]):
+            return self._db[index[id[1]]()]
 
     def _initialize_db(self, path: str):
         with open(path, "a+") as file:
