@@ -90,6 +90,8 @@ def delete_jane():
 load_duplicate_data()
 load_database()
 
+Path.unlink(Path("students.txt"))
+
 print("Creating students.txt")
 students = db.Database("students.txt", db.Student)
 
