@@ -4,7 +4,7 @@ from os import PathLike
 from types import GenericAlias
 from typing import Any, Callable, Iterable, Protocol, TextIO, Type, cast
 
-from parser import parse_row, try_parse, validate_table
+from .parser import parse_row, try_parse, validate_table
 
 
 @dataclass(frozen=True)
@@ -50,36 +50,37 @@ def has_duplicate_headers(headers: Iterable[str]) -> bool:
 
 
 def load_db[T](
-    file: TextIO,
+    path: PathLike,
     constructor: Callable[..., T],
     structure: dict[str, Callable[..., Any]],
 ) -> list[T]:
-    content = file.readlines()
-    headers = content[0].split(",")
-    table = content[1:]
+    with open(path, "r") as file:
+        content = file.readlines()
+        headers = content[0].split(",")
+        table = content[1:]
 
-    if verify_table_headers(structure, headers):
-        raise ValueError("Bad database format")
+        if verify_table_headers(structure, headers):
+            raise ValueError("Bad database format")
 
-    validate_table(table)
+        validate_table(table)
 
-    for row in table:
-        [
-            try_parse(cell, column_type)
-            for column_type, cell in zip(
-                [structure[header] for header in headers], parse_row(row)
+        for row in table:
+            [
+                try_parse(cell, column_type)
+                for column_type, cell in zip(
+                    [structure[header] for header in headers], parse_row(row)
+                )
+            ]
+
+        return [
+            constructor(
+                **{
+                    header: try_parse(cell, structure[header])
+                    for header, cell in zip(headers, parse_row(row))
+                }
             )
+            for row in table
         ]
-
-    return [
-        constructor(
-            **{
-                header: try_parse(cell, structure[header])
-                for header, cell in zip(headers, parse_row(row))
-            }
-        )
-        for row in table
-    ]
 
 
 class Database[T: Unique]:
@@ -89,8 +90,9 @@ class Database[T: Unique]:
             [(field.name, resolve_type(field.type)) for field in fields(structure)]
         )
         self.file = file
-        with open(file, "r") as csv:
-            self.db: list[T] = load_db(csv, self.type, self.structure)
+        # CLOSE FILE AFTER OPERATION: DOESN'T UPDATE
+        self.lazy_initialize_db(file)
+        self.db: list[T] = load_db(file, self.type, self.structure)
         self.index: dict[str, dict[Any, T]] = dict(
             create_indexes(unique_keys[self.type], self.db)
         )
@@ -109,6 +111,12 @@ class Database[T: Unique]:
 
     def read(self, id: tuple[str, str]):
         pass
+
+    def lazy_initialize_db(self, file: PathLike):
+        with open(file, "a+") as csv:
+            csv.seek(0)
+            if not csv.read(1):
+                csv.write(",".join([name for name, _ in self.structure.items()]))
 
 
 def create_indexes[T: Unique](
