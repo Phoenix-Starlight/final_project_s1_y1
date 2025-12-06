@@ -40,3 +40,4 @@ def insert_twice():
 
 load_duplicate_data()
 insert_non_unique_email()
+insert_twice()
