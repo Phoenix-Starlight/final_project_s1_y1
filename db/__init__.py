@@ -1,7 +1,16 @@
 from collections import Counter
 from dataclasses import dataclass, fields
 from types import GenericAlias
-from typing import Any, Callable, Iterable, Protocol, TextIO, Type, TypeVar, cast
+from typing import (
+    Any,
+    Callable,
+    Iterable,
+    Protocol,
+    TextIO,
+    Type,
+    TypeVar,
+    cast,
+)
 
 from .parser import parse_row, try_parse, validate_table
 
@@ -123,11 +132,16 @@ class Database[T: Unique]:
         if ref := self._index[id[0]][id[1]]:
             self._db[ref()] = obj
 
-    def delete(self, id: tuple[str, Any]):
-        pass
+    def delete(self, id: tuple[str, Any]) -> bool:
+        if ref := self._index[id[0]][id[1]]:
+            del self._db[ref()]
+            del self._index[id[0]][id[1]]
+            return True
+        return False
 
-    def read(self, id: tuple[str, str]):
-        pass
+    def read(self, id: tuple[str, str]) -> T | None:
+        if ref := self._index[id[0]][id[1]]:
+            return self._db[ref()]
 
     def _initialize_db(self, path: str):
         with open(path, "a+") as file:
