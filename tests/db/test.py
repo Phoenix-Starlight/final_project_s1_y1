@@ -1,7 +1,7 @@
 import os
 import traceback
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 import db
 
@@ -35,7 +35,8 @@ def insert_non_unique_email():
 
 @catch_and_log
 def insert_twice():
-    students.read(("id", 0))
+    with students:
+        students.insert(cast(db.Student, students.read(("id", 0))))
 
 
 load_duplicate_data()
