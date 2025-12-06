@@ -90,7 +90,7 @@ class Database[T: Unique]:
         )
         self.file = file
         # CLOSE FILE AFTER OPERATION: DOESN'T UPDATE
-        self.lazy_initialize_db(file)
+        self.initialize_db(file)
         self.db: list[T] = load_db(file, self.type, self.structure)
         self.index: dict[str, dict[Any, Callable[[], T]]] = dict(
             create_indexes(unique_keys[self.type], self.db)
@@ -112,7 +112,7 @@ class Database[T: Unique]:
     def read(self, id: tuple[str, str]):
         pass
 
-    def lazy_initialize_db(self, path: str):
+    def initialize_db(self, path: str):
         with open(path, "a+") as file:
             file.seek(0)
             if not file.read(1):
