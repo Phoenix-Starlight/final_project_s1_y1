@@ -54,7 +54,7 @@ def load_db[T](
     structure: dict[str, Callable[..., Any]],
 ) -> list[T]:
     with open(path, "r") as file:
-        content = file.readlines()
+        content = file.read().splitlines()
         headers = content[0].split(",")
         table = content[1:]
 
@@ -131,7 +131,13 @@ class Database[T: Unique]:
         ]
 
     def _write_db(self, file: TextIO) -> None:
-        file.writelines([self.generate_headers()] + self.generate_content())
+        # Have to append \n
+        file.writelines(
+            map(
+                lambda str: str + "\n",
+                [self.generate_headers()] + self.generate_content(),
+            )
+        )
 
     def __enter__(self):
         self._fd = open(self.file, "r+")
