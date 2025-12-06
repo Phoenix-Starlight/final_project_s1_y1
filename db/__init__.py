@@ -112,21 +112,26 @@ class Database[T: Unique]:
     def read(self, id: tuple[str, str]):
         pass
 
-    def lazy_initialize_db(self, file: str):
-        with open(file, "a+") as csv:
-            csv.seek(0)
-            if not csv.read(1):
-                csv.write(",".join([name for name, _ in self.structure.items()]))
+    def lazy_initialize_db(self, path: str):
+        with open(path, "a+") as file:
+            file.seek(0)
+            if not file.read(1):
+                self.write_headers(file)
 
-    def write_db(self, file: TextIO) -> None:
+    def write_headers(self, file: TextIO):
+        file.write(",".join([name for name, _ in self.structure.items()]))
+
+    def write_content(self, file: TextIO):
         file.writelines(
             [
-                ",".join(
-                    [str(v) for field in fields(record) for v in record[field.name]]
-                )
+                ",".join([str(record[field.name]) for field in fields(record)])
                 for record in self.db
             ]
         )
+
+    def write_db(self, file: TextIO) -> None:
+        self.write_headers(file)
+        self.write_content(file)
 
     def __enter__(self):
         self._fd = open(self.file, "r+")
