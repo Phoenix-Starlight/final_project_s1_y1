@@ -82,6 +82,12 @@ def load_db[T](
         ]
 
 
+# Maintain a dynamically solved reference for easy updates
+# Makes deletion harder
+Index = dict[Any, Callable[[], int]]
+IndexReference = dict[str, Index]
+
+
 class Database[T: Unique]:
     def __init__(self, file: str, structure: Type[T]) -> None:
         self.type = structure
@@ -92,7 +98,7 @@ class Database[T: Unique]:
         # CLOSE FILE AFTER OPERATION: DOESN'T UPDATE
         self._initialize_db(file)
         self._db: list[T] = load_db(file, self.type, self.structure)
-        self._index: dict[str, dict[Any, Callable[[], int]]] = dict(
+        self._index: IndexReference = dict(
             create_indexes(unique_keys[self.type], self._db)
         )
         self._fd: TextIO | None = None
@@ -165,11 +171,6 @@ class Database[T: Unique]:
 
 # We say that it can be any subtype of Unique
 T = TypeVar("T", bound=Unique, covariant=True)
-
-# Maintain a dynamically solved reference for easy updates
-# Makes deletion harder
-Index = dict[Any, Callable[[], int]]
-IndexReference = dict[str, Index]
 
 
 def create_indexes(unique_keys: list[str], db: list[T]) -> IndexReference:
