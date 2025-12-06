@@ -24,7 +24,17 @@ def load_duplicate_data():
     db.Database("invalid-students.txt", db.Student)
 
 
+Path.unlink(Path("valid-students.txt"))
+
 students = db.Database("valid-students.txt", db.Student)
+# Not wrapped as this should not fail
+with students:
+    students.insert(db.Student(0, "John", "example@example.com"))
+    id_identifier = ("id", 0)
+    email_identifier = ("email", "example@example.com")
+    print(
+        f"students.read(id_identifier) == students.read(email_identifier)? {students.read(id_identifier) == students.read(email_identifier)}"
+    )
 
 
 @catch_and_log
