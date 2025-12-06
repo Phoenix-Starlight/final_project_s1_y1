@@ -9,7 +9,8 @@ from parser import parse_row, try_parse, validate_table
 
 @dataclass(frozen=True)
 class Unique(Protocol):
-    pass
+    def __getitem__(self, name):
+        return getattr(self, name)
 
 
 @dataclass(frozen=True)
