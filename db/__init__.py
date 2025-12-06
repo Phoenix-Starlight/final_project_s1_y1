@@ -90,7 +90,7 @@ class Database[T: Unique]:
         )
         self.file = file
         # CLOSE FILE AFTER OPERATION: DOESN'T UPDATE
-        self.initialize_db(file)
+        self._initialize_db(file)
         self._db: list[T] = load_db(file, self.type, self.structure)
         self._index: dict[str, dict[Any, Callable[[], tuple[int, T]]]] = dict(
             create_indexes(unique_keys[self.type], self._db)
@@ -112,26 +112,26 @@ class Database[T: Unique]:
     def read(self, id: tuple[str, str]):
         pass
 
-    def initialize_db(self, path: str):
+    def _initialize_db(self, path: str):
         with open(path, "a+") as file:
             file.seek(0)
             if not file.read(1):
-                self.write_headers(file)
+                self._write_headers(file)
 
-    def write_headers(self, file: TextIO):
-        file.write(",".join([name for name, _ in self.structure.items()]))
+    def _write_headers(self, file: TextIO):
+        file.write(self.generate_headers())
 
-    def write_content(self, file: TextIO):
-        file.writelines(
-            [
-                ",".join([str(record[field.name]) for field in fields(record)])
-                for record in self._db
-            ]
-        )
+    def generate_headers(self):
+        return ",".join([name for name, _ in self.structure.items()])
 
-    def write_db(self, file: TextIO) -> None:
-        self.write_headers(file)
-        self.write_content(file)
+    def generate_content(self):
+        return [
+            ",".join([str(record[field.name]) for field in fields(record)])
+            for record in self._db
+        ]
+
+    def _write_db(self, file: TextIO) -> None:
+        file.writelines([self.generate_headers()] + self.generate_content())
 
     def __enter__(self):
         self._fd = open(self.file, "r+")
@@ -140,7 +140,7 @@ class Database[T: Unique]:
     def __exit__(self, type, _, __):
         # We know this is safe because __exit__ is only called after __enter__
         fd = cast(TextIO, self._fd)
-        self.write_db(fd)
+        self._write_db(fd)
         fd.close()
         self._fd = None
 
