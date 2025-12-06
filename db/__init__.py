@@ -1,7 +1,7 @@
 from collections import Counter
 from dataclasses import dataclass, fields
 from types import GenericAlias
-from typing import Any, Callable, Iterable, Protocol, Type, TypeVar, cast
+from typing import Any, Callable, Iterable, Protocol, TextIO, Type, TypeVar, cast
 
 from .parser import parse_row, try_parse, validate_table
 
@@ -95,6 +95,7 @@ class Database[T: Unique]:
         self.index: dict[str, dict[Any, Callable[[], T]]] = dict(
             create_indexes(unique_keys[self.type], self.db)
         )
+        self._fd: TextIO | None = None
 
     def insert(self, object: T):
         if type(object) is not self.type:
@@ -116,6 +117,27 @@ class Database[T: Unique]:
             csv.seek(0)
             if not csv.read(1):
                 csv.write(",".join([name for name, _ in self.structure.items()]))
+
+    def write_db(self, file: TextIO) -> None:
+        file.writelines(
+            [
+                ",".join(
+                    [str(v) for field in fields(record) for v in record[field.name]]
+                )
+                for record in self.db
+            ]
+        )
+
+    def __enter__(self):
+        self._fd = open(self.file, "r+")
+        return self
+
+    def __exit__(self, type, _, __):
+        # We know this is safe because __exit__ is only called after __enter__
+        fd = cast(TextIO, self._fd)
+        self.write_db(fd)
+        fd.close()
+        self._fd = None
 
 
 # We say that it can be any subtype of Unique
