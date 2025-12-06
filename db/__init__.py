@@ -2,7 +2,7 @@ from collections import Counter
 from dataclasses import dataclass, fields
 from os import PathLike
 from types import GenericAlias
-from typing import Any, Callable, Iterable, Protocol, TextIO, Type, cast
+from typing import Any, Callable, Iterable, Protocol, TextIO, Type, TypeVar, cast
 
 from .parser import parse_row, try_parse, validate_table
 
@@ -93,7 +93,7 @@ class Database[T: Unique]:
         # CLOSE FILE AFTER OPERATION: DOESN'T UPDATE
         self.lazy_initialize_db(file)
         self.db: list[T] = load_db(file, self.type, self.structure)
-        self.index: dict[str, dict[Any, T]] = dict(
+        self.index: dict[str, dict[Any, Callable[[], T]]] = dict(
             create_indexes(unique_keys[self.type], self.db)
         )
 
@@ -119,18 +119,24 @@ class Database[T: Unique]:
                 csv.write(",".join([name for name, _ in self.structure.items()]))
 
 
-def create_indexes[T: Unique](
-    unique_keys: list[str], db: list[T]
-) -> dict[str, dict[Any, T]]:
-    indexes: dict[str, dict[Any, T]] = {}
+# We say that it can be any subtype of Unique
+T = TypeVar("T", bound=Unique, covariant=True)
+
+# Maintain a dynamically solved reference for easy updates
+# Makes deletion harder
+IndexReference = dict[str, dict[Any, Callable[[], T]]]
+
+
+def create_indexes[T: Unique](unique_keys: list[str], db: list[T]) -> IndexReference:
+    indexes: IndexReference = {}
     for key in unique_keys:
         indexes[key] = {}
-        for record in db:
+        for index, record in enumerate(db):
             if (index := record[key]) in indexes[key]:
                 raise ValueError(
                     f"Bad index for `{key}`: value `{index}` already present"
                 )
-            indexes[key][record[key]] = record
+            indexes[key][record[key]] = lambda: db[index]
 
     return indexes
 
