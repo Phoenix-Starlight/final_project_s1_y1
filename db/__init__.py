@@ -2,7 +2,7 @@ from collections import Counter
 from dataclasses import dataclass, fields
 from os import PathLike
 from types import GenericAlias
-from typing import Any, Callable, Iterable, Protocol, TextIO, Type, TypeVar, cast
+from typing import Any, Callable, Iterable, Protocol, Type, TypeVar, cast
 
 from .parser import parse_row, try_parse, validate_table
 
@@ -84,7 +84,7 @@ def load_db[T](
 
 
 class Database[T: Unique]:
-    def __init__(self, file: PathLike, structure: T) -> None:
+    def __init__(self, file: PathLike, structure: Type[T]) -> None:
         self.type = type(structure)
         self.structure = dict(
             [(field.name, resolve_type(field.type)) for field in fields(structure)]
