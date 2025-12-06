@@ -97,13 +97,14 @@ class Database[T: Unique]:
             raise TypeError()
         self.db.append(object)
 
-    def update(self, id: dict[str, str], obj: T):
+    def update(self, id: tuple[str, Any], obj: T):
+        # Do in-place replacement of self.db;
         pass
 
-    def delete(self, id: dict[str, str]):
+    def delete(self, id: tuple[str, Any]):
         pass
 
-    def read(self, id: dict[str, str]):
+    def read(self, id: tuple[str, str]):
         pass
 
 
