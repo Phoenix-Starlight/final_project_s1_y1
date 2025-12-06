@@ -50,6 +50,13 @@ def insert_twice():
         students.insert(cast(db.Student, students.read(("id", 0))))
 
 
+@catch_and_log
+def update_unique_key():
+    with students:
+        students.update(("id", 0), db.Student(1, "John", "example@example.com"))
+
+
 load_duplicate_data()
 insert_non_unique_email()
 insert_twice()
+update_unique_key()
