@@ -150,12 +150,12 @@ class Database[T: Unique]:
                 self._write_headers(file)
 
     def _write_headers(self, file: TextIO):
-        file.write(self.generate_headers())
+        file.write(self._generate_headers())
 
-    def generate_headers(self):
+    def _generate_headers(self):
         return ",".join([name for name, _ in self.structure.items()])
 
-    def generate_content(self):
+    def _generate_content(self):
         return [
             ",".join([str(record[field.name]) for field in fields(record)])
             for record in self._db
@@ -166,7 +166,7 @@ class Database[T: Unique]:
         file.writelines(
             map(
                 lambda str: str + "\n",
-                [self.generate_headers()] + self.generate_content(),
+                [self._generate_headers()] + self._generate_content(),
             )
         )
 
