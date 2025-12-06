@@ -91,6 +91,9 @@ class Database[T: Unique]:
         self.file = file
         with open(file, "r") as csv:
             self.db: list[T] = load_db(csv, self.type, self.structure)
+        self.index: dict[str, dict[Any, T]] = dict(
+            create_indexes(unique_keys[self.type], self.db)
+        )
 
     def insert(self, object: T):
         if type(object) is not self.type:
@@ -106,6 +109,22 @@ class Database[T: Unique]:
 
     def read(self, id: tuple[str, str]):
         pass
+
+
+def create_indexes[T: Unique](
+    unique_keys: list[str], db: list[T]
+) -> dict[str, dict[Any, T]]:
+    indexes: dict[str, dict[Any, T]] = {}
+    for key in unique_keys:
+        indexes[key] = {}
+        for record in db:
+            if (index := record[key]) in indexes[key]:
+                raise ValueError(
+                    f"Bad index for `{key}`: value `{index}` already present"
+                )
+            indexes[key][record[key]] = record
+
+    return indexes
 
 
 def return_tuple(structure: Unique):
