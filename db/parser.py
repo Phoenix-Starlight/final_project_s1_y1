@@ -33,10 +33,10 @@ def parse_array(arr: str, type: Callable[..., Any]) -> list | None:
 
 def parse_row(datum: str) -> list[str]:
     return [
-        item.rstrip(",")
+        stripped
         for match in re.finditer(data_regex, datum)
         for item in match.groups()
-        if item is not None
+        if item and (stripped := item.rstrip(","))
     ]
 
 
