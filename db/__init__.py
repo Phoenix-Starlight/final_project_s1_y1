@@ -92,7 +92,7 @@ class Database[T: Unique]:
         # CLOSE FILE AFTER OPERATION: DOESN'T UPDATE
         self._initialize_db(file)
         self._db: list[T] = load_db(file, self.type, self.structure)
-        self._index: dict[str, dict[Any, Callable[[], tuple[int, T]]]] = dict(
+        self._index: dict[str, dict[Any, Callable[[], int]]] = dict(
             create_indexes(unique_keys[self.type], self._db)
         )
         self._fd: TextIO | None = None
@@ -139,6 +139,7 @@ class Database[T: Unique]:
             )
         )
 
+    # Enables `with` syntax
     def __enter__(self):
         self._fd = open(self.file, "r+")
         return self
@@ -156,21 +157,21 @@ T = TypeVar("T", bound=Unique, covariant=True)
 
 # Maintain a dynamically solved reference for easy updates
 # Makes deletion harder
-IndexReference = dict[str, dict[Any, Callable[[], tuple[int, T]]]]
+Index = dict[Any, Callable[[], int]]
+IndexReference = dict[str, Index]
 
 
 def create_indexes(unique_keys: list[str], db: list[T]) -> IndexReference:
-    indexes: IndexReference = {}
-    for key in unique_keys:
-        indexes[key] = {}
-        for index, record in enumerate(db):
-            if (index := record[key]) in indexes[key]:
-                raise ValueError(
-                    f"Bad index for `{key}`: value `{index}` already present"
-                )
-            indexes[key][record[key]] = lambda: (index, db[index])
+    return {key: create_index(db, key) for key in unique_keys}
 
-    return indexes
+
+def create_index(db: list[T], key: str):
+    index: Index = {}
+    for i, record in enumerate(db):
+        if (value := record[key]) in index:
+            raise ValueError(f"Bad index for `{key}`: value `{index}` already present")
+        index[value] = lambda: (i)
+    return index
 
 
 def return_tuple(structure: Unique):
