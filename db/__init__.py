@@ -144,7 +144,7 @@ class Database[T: Unique]:
             return True
         return False
 
-    def read(self, id: tuple[str, str]) -> T | None:
+    def read(self, id: tuple[str, Any]) -> T | None:
         if ref := self._index[id[0]][id[1]]:
             return self._db[ref()]
 
