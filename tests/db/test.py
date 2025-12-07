@@ -173,6 +173,54 @@ test_update_then_delete()
 print("Deleting students.txt")
 Path.unlink(Path("students.txt"))
 
+
+@succeed
+def test_course_db(courses):
+    with courses:
+        courses.insert(db.Course("CSC1204", "Programming Principles"))
+
+
+try:
+    Path.unlink(Path("courses.txt"))
+except Exception:
+    pass
+
+print("Creating courses.txt")
+test_course_db(db.courses())
+print("Deleting courses.txt")
+Path.unlink(Path("courses.txt"))
+
+
+@succeed
+def test_grade_insertion():
+    # This is a terrible solution for integration tests.
+    global test_results
+    original_test_results = test_results.copy()
+
+    print("Creating courses.txt")
+    print("Creating students.txt")
+    students = db.students()
+    courses = db.courses()
+
+    # Aready tested
+    insert_first_record(students)
+    with courses:
+        courses.insert(db.Course("CSC1204", "Programming Principles"))
+
+    print("Creating grades.txt")
+    grades = db.grades()
+
+    with grades:
+        marks = [0, 100]
+        grades.insert(db.Grade(0, "CSC1204", marks, letter_grade(marks)))
+
+    test_results = original_test_results
+    if any(not v for v in test_results.values()):
+        raise AssertionError()
+
+
+test_grade_insertion()
+print("Deleting students.txt")
 Path.unlink(Path("students.txt"))
 
 
