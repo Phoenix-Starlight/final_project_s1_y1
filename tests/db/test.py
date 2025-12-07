@@ -212,7 +212,7 @@ def test_grade_insertion():
 
     with grades:
         marks = [0, 100]
-        grades.insert(db.Grade(0, "CSC1204", marks, letter_grade(marks)))
+        grades.insert(db.Grade(0, "Programming Principles", marks, letter_grade(marks)))
 
     test_results = original_test_results
     if any(not v for v in test_results.values()):
