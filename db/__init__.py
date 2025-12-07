@@ -137,18 +137,13 @@ class Database[T: Unique]:
     def _generate_headers(self):
         return ",".join([name for name, _ in self.structure.items()])
 
-    def _generate_content(self):
-        return [
-            ",".join([str(record[field.name]) for field in fields(record)])
-            for record in self._db
-        ]
-
     def _write_db(self, file: TextIO) -> None:
         # Have to append \n
         file.writelines(
             map(
                 lambda str: str + "\n",
-                [self._generate_headers()] + self._generate_content(),
+                [self._generate_headers()]
+                + generate_content(record for record in self._db if record is not None),
             )
         )
 
@@ -167,6 +162,10 @@ class Database[T: Unique]:
         self._fd = None
 
 
+def generate_content(db: Iterable[T]):
+    return [
+        ",".join([str(record[field.name]) for field in fields(record)]) for record in db
+    ]
 
 
 def return_tuple(structure: Unique):
