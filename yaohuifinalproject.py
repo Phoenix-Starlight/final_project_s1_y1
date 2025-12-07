@@ -301,7 +301,7 @@ def display_course_summary():
         print(f"  Lowest Mark: {min(all_marks)}")
 
 def export_report():
-    """选项6：导出报告"""
+    
     print("Option 6: Export Report")
     print("Select Report Type\n")
     
@@ -459,3 +459,4 @@ def main():
 if __name__ == "__main__":
     main()
     
+
