@@ -7,21 +7,39 @@ import db
 # Change path to tests/db (parent of test.py) to not contaminate
 os.chdir(Path(__file__).parent)
 
+test_results: dict[str, bool] = {}
+
 
 def catch_and_log(x: Callable[..., Any]):
     def log():
         try:
-            x()
-        except ExceptionGroup as e:
-            print(e)
-            for e in e.exceptions:
+            try:
+                x()
+            except ExceptionGroup as e:
                 print(e)
-            print("Task failed successfully")
-        except Exception as e:
-            print(e)
-            print("Task failed successfully")
+                for e in e.exceptions:
+                    print(e)
+                print("Task failed successfully")
+                raise e
+            except Exception as e:
+                print(e)
+                print("Task failed successfully")
+                raise e
+        except Exception:
+            test_results[x.__name__] = True
 
     return log
+
+
+def succeed(x: Callable):
+    def should_pass():
+        try:
+            x()
+            test_results[x.__name__] = True
+        except Exception:
+            test_results[x.__name__] = False
+
+    return should_pass
 
 
 @catch_and_log
@@ -29,11 +47,12 @@ def load_duplicate_data():
     db.Database("invalid-students.txt", db.Student)
 
 
+@succeed
 def load_database():
     db.Database("valid-students.txt", db.Student)
 
 
-# Not wrapped as this should not fail
+@succeed
 def insert_first_record():
     with students:
         students.insert(db.Student(0, "John", "example@example.com"))
@@ -43,12 +62,13 @@ def insert_first_record():
         )
 
 
-# Not wrapped as this should not fail
+@succeed
 def insert_second_record():
     with students:
         students.insert(db.Student(1, "John", "john@example.com"))
 
 
+@succeed
 def read_second_record():
     with students:
         record = students.read(("id", 1))
@@ -73,6 +93,7 @@ def update_unique_key():
         students.update(id_identifier, db.Student(1, "John", "example@example.com"))
 
 
+@succeed
 def update_name():
     with students:
         students.update(id_identifier, db.Student(0, "Jane", "example@example.com"))
@@ -83,6 +104,7 @@ def update_name():
         print(f"jane == same_jane? {jane == same_jane}")
 
 
+@succeed
 def delete_jane():
     with students:
         students.delete(id_identifier)
@@ -125,3 +147,12 @@ insert_second_record()
 delete_jane()
 
 Path.unlink(Path("students.txt"))
+
+categorized_test_results: dict[bool, list[str]] = {True: [], False: []}
+for name, success in test_results.items():
+    categorized_test_results[success].append(name)
+if (failed_tests := len(categorized_test_results[False])) == 0:
+    print("TESTS PASSED")
+    exit()
+
+print(f"{failed_tests}/{len(test_results)} TESTS FAILED")
