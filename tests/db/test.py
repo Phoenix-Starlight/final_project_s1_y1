@@ -220,8 +220,9 @@ def test_grade_insertion():
 
 
 test_grade_insertion()
-print("Deleting students.txt")
-Path.unlink(Path("students.txt"))
+print("Deleting students.txt, courses.txt, grades.txt")
+for path in ["students.txt", "courses.txt", "grades.txt"]:
+    Path.unlink(Path(path))
 
 
 categorized_test_results: dict[bool, list[str]] = {True: [], False: []}
