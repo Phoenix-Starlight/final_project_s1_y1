@@ -190,3 +190,32 @@ def resolve_type(t: Type[Any] | str | Any) -> Callable[..., Any]:
         # Still has something that returns an object of type t.
         case _:
             return t
+
+
+def students():
+    return Database("students.txt", Student)
+
+
+def courses():
+    return Database("courses.txt", Course)
+
+
+def grades():
+    def enforce_dependence(insert: Callable[[Grade], None]):
+        def hold_insert_func(self: Database[Grade], object: Grade):
+            student_db = students()
+            course_db = courses()
+            if not student_db.read(("id", object.student_id)) or not course_db.read(
+                ("name", object.course_name)
+            ):
+                raise ValueError(
+                    f"Record {object} does not have respective keys present in `students.txt` or `courses.txt`"
+                )
+            insert(object)
+
+        return hold_insert_func
+
+    # Enforce dependency on students and courses
+    db = Database("grades.txt", Grade)
+    db.insert = MethodType(enforce_dependence(db.insert), db)
+    return db
