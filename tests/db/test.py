@@ -134,11 +134,11 @@ load_duplicate_data()
 load_database()
 
 try:
-    Path.unlink(Path("students.txt"))
+    Path.unlink(Path(f"{db.data_dir}/students.txt"))
 except Exception:
     pass
 
-print("Creating students.txt")
+print(f"Creating {db.data_dir}/students.txt")
 succeed(db.students)()
 id_identifier = ("id", 0)
 for test in [
@@ -149,7 +149,7 @@ for test in [
 ]:
     test(db.students())
 print("Deleting students.txt")
-Path.unlink(Path("students.txt"))
+Path.unlink(Path(f"{db.data_dir}/students.txt"))
 
 
 @succeed
@@ -160,7 +160,7 @@ def test_update_then_delete():
 
     test_results.clear()
 
-    print("Creating students.txt")
+    print(f"Creating {db.data_dir}/students.txt")
     for test in [insert_first_record, update_name, insert_second_record, delete_jane]:
         test(db.students())
 
@@ -171,7 +171,7 @@ def test_update_then_delete():
 
 test_update_then_delete()
 print("Deleting students.txt")
-Path.unlink(Path("students.txt"))
+Path.unlink(Path(f"{db.data_dir}/students.txt"))
 
 
 @succeed
@@ -181,14 +181,14 @@ def test_course_db(courses):
 
 
 try:
-    Path.unlink(Path("courses.txt"))
+    Path.unlink(Path(f"{db.data_dir}/courses.txt"))
 except Exception:
     pass
 
-print("Creating courses.txt")
+print(f"Creating {db.data_dir}/courses.txt")
 test_course_db(db.courses())
 print("Deleting courses.txt")
-Path.unlink(Path("courses.txt"))
+Path.unlink(Path(f"{db.data_dir}/courses.txt"))
 
 
 @succeed
@@ -197,8 +197,8 @@ def test_grade_insertion():
     global test_results
     original_test_results = test_results.copy()
 
-    print("Creating courses.txt")
-    print("Creating students.txt")
+    print(f"Creating {db.data_dir}/courses.txt")
+    print(f"Creating {db.data_dir}/students.txt")
     students = db.students()
     courses = db.courses()
 
@@ -207,7 +207,7 @@ def test_grade_insertion():
     with courses:
         courses.insert(db.Course("CSC1204", "Programming Principles"))
 
-    print("Creating grades.txt")
+    print(f"Creating {db.data_dir}/grades.txt")
     grades = db.grades()
 
     with grades:
@@ -221,7 +221,11 @@ def test_grade_insertion():
 
 test_grade_insertion()
 print("Deleting students.txt, courses.txt, grades.txt")
-for path in ["students.txt", "courses.txt", "grades.txt"]:
+for path in [
+    f"{db.data_dir}/students.txt",
+    f"{db.data_dir}/courses.txt",
+    f"{db.data_dir}/grades.txt",
+]:
     Path.unlink(Path(path))
 
 
@@ -231,8 +235,8 @@ def test_grade_insertion_fail():
     global test_results
     original_test_results = test_results.copy()
 
-    print("Creating courses.txt")
-    print("Creating students.txt")
+    print(f"Creating {db.data_dir}/courses.txt")
+    print(f"Creating {db.data_dir}/students.txt")
     students = db.students()
     courses = db.courses()
 
@@ -241,7 +245,7 @@ def test_grade_insertion_fail():
     with courses:
         courses.insert(db.Course("CSC1204", "Programming Principles"))
 
-    print("Creating grades.txt")
+    print(f"Creating {db.data_dir}/grades.txt")
     grades = db.grades()
 
     with grades:
@@ -255,7 +259,11 @@ def test_grade_insertion_fail():
 
 test_grade_insertion_fail()
 print("Deleting students.txt, courses.txt, grades.txt")
-for path in ["students.txt", "courses.txt", "grades.txt"]:
+for path in [
+    f"{db.data_dir}/students.txt",
+    f"{db.data_dir}/courses.txt",
+    f"{db.data_dir}/grades.txt",
+]:
     Path.unlink(Path(path))
 
 categorized_test_results: dict[bool, list[str]] = {True: [], False: []}

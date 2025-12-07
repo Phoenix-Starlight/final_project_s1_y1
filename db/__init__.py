@@ -1,5 +1,6 @@
 from collections import Counter
 from dataclasses import fields
+from pathlib import Path
 from types import GenericAlias, MethodType
 from typing import (
     Any,
@@ -192,15 +193,28 @@ def resolve_type(t: Type[Any] | str | Any) -> Callable[..., Any]:
         case _:
             return t
 
+data_dir = "data"
 
+
+def data(x):
+    def func():
+        Path(data_dir).mkdir(exist_ok=True)
+        return x()
+
+    return func
+
+
+@data
 def students():
-    return Database("students.txt", Student)
+    return Database("data/students.txt", Student)
 
 
+@data
 def courses():
-    return Database("courses.txt", Course)
+    return Database("data/courses.txt", Course)
 
 
+@data
 def grades():
     def enforce_dependence(insert: Callable[[Grade], None]):
         def hold_insert_func(self: Database[Grade], object: Grade):
@@ -217,6 +231,6 @@ def grades():
         return hold_insert_func
 
     # Enforce dependency on students and courses
-    db = Database("grades.txt", Grade)
+    db = Database("data/grades.txt", Grade)
     db.insert = MethodType(enforce_dependence(db.insert), db)
     return db
