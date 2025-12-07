@@ -107,20 +107,21 @@ class Database[T: Unique]:
         # CLOSE FILE AFTER OPERATION: DOESN'T UPDATE
         self._initialize_db(file)
         self._db: list[T] = load_db(file, self.type, self.structure)
+        self._unique_columns = unique_keys[self.type]
         self._index: IndexReference = dict(
-            create_indexes(unique_keys[self.type], self._db)
+            create_indexes(self._unique_columns, self._db)
         )
         self._fd: TextIO | None = None
 
     def insert(self, object: T):
         if (t := type(object)) is not self.type:
             raise TypeError(f"{object} of type {t} does not match type {self.type}")
-        for k in unique_keys[self.type]:
+        for k in self._unique_columns:
             if (v := object[k]) in self._index[k]:
                 raise BadIndex(k, v, object, self.insert)
         self._db.append(object)
         i = len(self._db) - 1
-        for k in unique_keys[self.type]:
+        for k in self._unique_columns:
             self._index[k][object[k]] = lambda: i
 
     def update(self, id: tuple[str, Any], obj: T) -> bool:
@@ -129,7 +130,7 @@ class Database[T: Unique]:
         exceptions = [
             ValueError(f"Modifying unique column `{f.name}` is disallowed")
             for f in fields(obj)
-            if f.name in unique_keys[self.type]
+            if f.name in self._unique_columns
             if obj[f.name] != record[f.name]
         ]
         if len(exceptions) > 0:
@@ -137,17 +138,27 @@ class Database[T: Unique]:
                 "Uniquness was violated",
                 exceptions,
             )
-        if id[0] in self._index and id[1] in (index := self._index[id[0]]):
-            self._db[index[id[1]]()] = obj
-            return True
-        return False
+
+        ref = self._index[id[0]][id[1]]
+        self._db[ref()] = obj
+        return True
 
     def delete(self, id: tuple[str, Any]) -> bool:
-        if id[0] in self._index and id[1] in (index := self._index[id[0]]):
-            del self._db[index[id[1]]()]
-            del self._index[id[0]][id[1]]
-            return True
-        return False
+        if (record := self.read(id)) is None:
+            return False
+
+        index: int = -1
+        # Assert our indexes are not mangled and pointing to different records
+        for k, v in {k: record[k] for k in self._unique_columns}.items():
+            ref = self._index[k][v]
+            if index == -1:
+                index = ref()
+            elif index != ref():
+                raise BadIndex(id[0], id[1], record, self.delete)
+            del self._index[k][v]
+
+        del self._db[index]
+        return True
 
     def read(self, id: tuple[str, Any]) -> T | None:
         if id[0] in self._index and id[1] in (index := self._index[id[0]]):
