@@ -1,4 +1,20 @@
-Contents
+# Usage
+```py
+import db
+from db.schema import letter_grade
+
+students = students()
+courses = courses()
+grades = grades()
+with students:
+    students.insert(Student(0, "John", "john@example.com"))
+with courses:
+    courses.insert(Course("CSC1204", "Programming Principles"))
+with grades:
+    marks = [50, 75]
+    grades.insert(Grade(0, "Programming Principles", marks, letter_grade(marks)))
+```
+
 # Records
 The following operations on the database is supported:
 Insert
@@ -37,7 +53,7 @@ class Grade:
 ```
 
 # Database format
-The database is where student records are kept and maintained. Due to time constraints, the database is not general purpose.
+The database is where student records are kept and maintained. Due to time constraints, the database is not generalized.
 
 The database format specification follows below:
 1. A comma seperates data in columns. For example `A,B` represents A and B in the first and second column.
