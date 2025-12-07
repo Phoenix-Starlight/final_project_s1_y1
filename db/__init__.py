@@ -1,5 +1,5 @@
 from collections import Counter
-from dataclasses import dataclass, fields
+from dataclasses import fields
 from types import GenericAlias
 from typing import (
     Any,
@@ -13,40 +13,7 @@ from typing import (
 )
 
 from .parser import parse_row, try_parse, validate_table
-
-
-@dataclass(frozen=True)
-class Unique(Protocol):
-    def __getitem__(self, name):
-        return getattr(self, name)
-
-
-@dataclass(frozen=True)
-class Student(Unique):
-    id: int
-    name: str
-    email: str
-
-
-@dataclass(frozen=True)
-class Course(Unique):
-    id: str
-    name: str
-
-
-@dataclass(frozen=True)
-class Grade(Unique):
-    student_id: int
-    course_name: str
-    marks: list[int]
-    letter_grade: str
-
-
-unique_keys: dict[type, list[str]] = {
-    Student: ["id", "email"],
-    Course: ["id", "name"],
-    Grade: ["student_id", "course_name"],
-}
+from .schema import Course, Grade, Student, Unique, unique_keys
 
 
 def verify_table_headers(structure: Iterable[str], headers: Iterable[str]) -> bool:
