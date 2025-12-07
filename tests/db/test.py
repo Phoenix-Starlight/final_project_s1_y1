@@ -262,7 +262,7 @@ categorized_test_results: dict[bool, list[str]] = {True: [], False: []}
 for name, success in test_results.items():
     categorized_test_results[success].append(name)
 if (failed_tests := len(categorized_test_results[False])) == 0:
-    print("TESTS PASSED")
+    print(f"{len(test_results)} TESTS PASSED")
     exit()
 
 print(f"{failed_tests}/{len(test_results)} TESTS FAILED")
