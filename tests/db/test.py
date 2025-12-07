@@ -1,5 +1,4 @@
 import os
-import traceback
 from pathlib import Path
 from typing import Any, Callable, cast
 
@@ -42,6 +41,18 @@ def insert_first_record():
         print(
             f"students.read(id_identifier) == students.read(email_identifier)? {students.read(id_identifier) == students.read(email_identifier)}"
         )
+
+
+# Not wrapped as this should not fail
+def insert_second_record():
+    with students:
+        students.insert(db.Student(1, "John", "john@example.com"))
+
+
+def read_second_record():
+    with students:
+        record = students.read(("id", 1))
+        print(f"{record} is not None? {record is not None}")
 
 
 @catch_and_log
@@ -90,7 +101,10 @@ def delete_jane():
 load_duplicate_data()
 load_database()
 
-Path.unlink(Path("students.txt"))
+try:
+    Path.unlink(Path("students.txt"))
+except Exception:
+    pass
 
 print("Creating students.txt")
 students = db.Database("students.txt", db.Student)
@@ -104,6 +118,10 @@ insert_non_unique_email()
 insert_twice()
 update_unique_key()
 update_name()
+delete_jane()
+insert_first_record()
+update_name()
+insert_second_record()
 delete_jane()
 
 Path.unlink(Path("students.txt"))
