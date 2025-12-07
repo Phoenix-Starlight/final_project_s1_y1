@@ -1,11 +1,11 @@
 from collections import Counter
 from dataclasses import fields
-from types import GenericAlias
+from types import GenericAlias, MethodType
 from typing import (
     Any,
     Callable,
     Iterable,
-    Protocol,
+    Sequence,
     TextIO,
     Type,
     cast,
@@ -67,10 +67,11 @@ class Database[T: Unique]:
         self.file = file
         # CLOSE FILE AFTER OPERATION: DOESN'T UPDATE
         self._initialize_db(file)
-        self._db: list[T] = load_db(file, self.type, self.structure)
+        cold_storage: Sequence[T] = load_db(file, self.type, self.structure)
+        self._db: list[T | None] = list(cold_storage)
         self._unique_columns = unique_keys[self.type]
         self._index: IndexReference = dict(
-            create_indexes(self._unique_columns, self._db)
+            create_indexes(self._unique_columns, cold_storage)
         )
         self._fd: TextIO | None = None
 
@@ -118,7 +119,7 @@ class Database[T: Unique]:
                 raise BadIndex(id[0], id[1], record, self.delete)
             del self._index[k][v]
 
-        del self._db[index]
+        self._db[index] = None
         return True
 
     def read(self, id: tuple[str, Any]) -> T | None:
