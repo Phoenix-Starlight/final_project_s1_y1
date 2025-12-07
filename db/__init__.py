@@ -8,10 +8,10 @@ from typing import (
     Protocol,
     TextIO,
     Type,
-    TypeVar,
     cast,
 )
 
+from .index import BadIndex, IndexReference, T, create_indexes
 from .parser import parse_row, try_parse, validate_table
 from .schema import Course, Grade, Student, Unique, unique_keys
 
@@ -56,12 +56,6 @@ def load_db[T](
             )
             for row in table
         ]
-
-
-# Maintain a dynamically solved reference for easy updates
-# Makes deletion harder
-Index = dict[Any, Callable[[], int]]
-IndexReference = dict[str, Index]
 
 
 class Database[T: Unique]:
@@ -173,27 +167,6 @@ class Database[T: Unique]:
         self._fd = None
 
 
-# We say that it can be any subtype of Unique
-T = TypeVar("T", bound=Unique, covariant=True)
-
-
-def BadIndex(k, v, obj, keyword: Callable):
-    return ValueError(
-        f"Bad index `{k}` attempting to {keyword.__name__} `{obj}`: value `{v}` already present`"
-    )
-
-
-def create_indexes(unique_keys: list[str], db: list[T]) -> IndexReference:
-    return {key: create_index(db, key) for key in unique_keys}
-
-
-def create_index(db: list[T], key: str):
-    index: Index = {}
-    for i, record in enumerate(db):
-        if (v := record[key]) in index:
-            raise BadIndex(key, v, record, create_index)
-        index[v] = lambda: (i)
-    return index
 
 
 def return_tuple(structure: Unique):
