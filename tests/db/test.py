@@ -225,6 +225,39 @@ for path in ["students.txt", "courses.txt", "grades.txt"]:
     Path.unlink(Path(path))
 
 
+@catch_and_log
+def test_grade_insertion_fail():
+    # This is a terrible solution for integration tests.
+    global test_results
+    original_test_results = test_results.copy()
+
+    print("Creating courses.txt")
+    print("Creating students.txt")
+    students = db.students()
+    courses = db.courses()
+
+    # Aready tested
+    insert_first_record(students)
+    with courses:
+        courses.insert(db.Course("CSC1204", "Programming Principles"))
+
+    print("Creating grades.txt")
+    grades = db.grades()
+
+    with grades:
+        marks = [0, 100]
+        grades.insert(db.Grade(0, "CSC1204", marks, letter_grade(marks)))
+
+    test_results = original_test_results
+    if any(not v for v in test_results.values()):
+        raise AssertionError()
+
+
+test_grade_insertion_fail()
+print("Deleting students.txt, courses.txt, grades.txt")
+for path in ["students.txt", "courses.txt", "grades.txt"]:
+    Path.unlink(Path(path))
+
 categorized_test_results: dict[bool, list[str]] = {True: [], False: []}
 for name, success in test_results.items():
     categorized_test_results[success].append(name)
