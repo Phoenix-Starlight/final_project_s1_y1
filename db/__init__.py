@@ -186,7 +186,9 @@ class Database[T: Unique]:
         return self
 
     def __exit__(self, type, _, __):
-        # We know this is safe because __exit__ is only called after __enter__
+        if type:
+            print(f"State of database: {self._db}")
+        # We know this is not None because __exit__ is only called after __enter__
         fd = cast(TextIO, self._fd)
         self._write_db(fd)
         fd.close()
