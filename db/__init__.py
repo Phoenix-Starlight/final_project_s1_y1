@@ -78,7 +78,7 @@ class Database[T: Unique]:
 
     @property
     def db(self):
-        return [record for record in self._db if record is None]
+        return [record for record in self._db if record is not None]
 
     def insert(self, object: T):
         if (t := type(object)) is not self.type:
