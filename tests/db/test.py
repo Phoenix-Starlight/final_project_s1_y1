@@ -120,9 +120,9 @@ def delete_jane(students):
         result = students.read(id_identifier) is None
         print(f"students.read(id_identifier) is None? {result}")
         success |= attempt and not repeat_attempt and result
-    # Reopen to flush changes
+    # Reopen to flush changes and use new database to ensure it is in sync with disk
     print("Close and reopen database")
-    with students:
+    with db.students() as students:
         result = students.read(id_identifier) is None
         print(f"students.read(id_identifier) is None? {result}")
         success &= result
