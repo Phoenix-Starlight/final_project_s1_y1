@@ -56,25 +56,28 @@ class Grade:
 The database is where student records are kept and maintained. Due to time constraints, the database is not generalized.
 
 The database format specification follows below:
-1. A comma seperates data in columns. For example `A,B` represents A and B in the first and second column.
+1. A comma separates data in columns. For example `A,B` represents A and B in the first and second column.
 2. A newline indicates the end of a record.
-```csv
-A,B
-C,D
-```
-Represents record 1 and 2, whose contents are `A,B` and `C,D`
+
+   ```csv
+   A,B 
+   C,D
+   ```
+   Represents record 1 and 2, whose contents are `A,B` and `C,D`
 3. The first row labels the columns.
-```csv
-A,B,C
-1,2,3
-```
+   ```csv
+    A,B,C
+    1,2,3
+    ```
 This means the second row is the first real row, of which A = 1, B = 2, and C = 3.
+
+
 
 ## Arrays
 Arrays are defined as follow:
 1. `[` is the opening marker of an array
 2. `]` is the closing marker of an array
-3. `,` within the opening and closing marker seperates data.
+3. `,` within the opening and closing marker separates data.
 
 ## Uniqueness
 A reserved field `unique` is kept for unique columns.
