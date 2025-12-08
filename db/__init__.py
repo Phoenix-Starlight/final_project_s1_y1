@@ -76,6 +76,10 @@ class Database[T: Unique]:
         )
         self._fd: TextIO | None = None
 
+    @property
+    def db(self):
+        return [record for record in self._db if self._db is None]
+
     def insert(self, object: T):
         if (t := type(object)) is not self.type:
             raise TypeError(f"{object} of type {t} does not match type {self.type}")

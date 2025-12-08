@@ -1,4 +1,4 @@
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, TypeVar, Iterable
 
 from .schema import Unique
 
@@ -18,7 +18,7 @@ def BadIndex(k, v, obj, keyword: Callable):
     )
 
 
-def create_indexes(unique_keys: list[str], db: list[T]) -> IndexReference:
+def create_indexes(unique_keys: list[str], db: Iterable[T]) -> IndexReference:
     return {key: create_index(db, key) for key in unique_keys}
 
 
