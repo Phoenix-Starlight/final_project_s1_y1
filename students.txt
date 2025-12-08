@@ -1,2 +1,0 @@
-241075,Wayne Wong,wong@example.com
-232323,John Doe,john@example.com
