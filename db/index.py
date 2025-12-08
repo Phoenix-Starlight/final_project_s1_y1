@@ -1,4 +1,4 @@
-from typing import Any, Callable, TypeVar, Iterable
+from typing import Any, Callable, Iterable, TypeVar
 
 from .schema import Unique
 
@@ -22,7 +22,7 @@ def create_indexes(unique_keys: list[str], db: Iterable[T]) -> IndexReference:
     return {key: create_index(db, key) for key in unique_keys}
 
 
-def create_index(db: list[T], key: str):
+def create_index(db: Iterable[T], key: str):
     index: Index = {}
     for i, record in enumerate(db):
         if (v := record[key]) in index:
