@@ -163,6 +163,8 @@ class Database[T: Unique]:
             print(f"State of database: {self._db}")
         # We know this is not None because __exit__ is only called after __enter__
         fd = cast(TextIO, self._fd)
+        # Empty database
+        fd.truncate(0)
         self._write_db(fd)
         fd.close()
         self._fd = None
