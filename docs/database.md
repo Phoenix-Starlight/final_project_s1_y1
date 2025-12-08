@@ -3,16 +3,16 @@
 import db
 from db.schema import letter_grade
 
-students = students()
-courses = courses()
-grades = grades()
+students = db.students()
+courses = db.courses()
+grades = db.grades()
 with students:
-    students.insert(Student(0, "John", "john@example.com"))
+    students.insert(db.Student(0, "John", "john@example.com"))
 with courses:
-    courses.insert(Course("CSC1204", "Programming Principles"))
+    courses.insert(db.Course("CSC1204", "Programming Principles"))
 with grades:
     marks = [50, 75]
-    grades.insert(Grade(0, "Programming Principles", marks, letter_grade(marks)))
+    grades.insert(db.Grade(0, "Programming Principles", marks, letter_grade(marks)))
 ```
 
 # Records
