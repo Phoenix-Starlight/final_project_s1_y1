@@ -1,12 +1,15 @@
 # Validating ID
+import db
+
+
 def is_valid_student(student_id):
     # Any will return True if student_id exists within,it will be false otherwise.
-    students = read_students()
+    students = db.students()
     return any(s["id"] == student_id for s in students)
 
 def get_individual(student_id):
-    students = read_students()
-    grades = read_grades()
+    students = db.students()
+    grades = db.grades()
 
     student = next((s for s in students if s["id"] == student_id), None)
     if not student:
@@ -23,7 +26,7 @@ def get_individual(student_id):
 
 
 def get_course_summary(course_name):
-    grades = read_grades()
+    grades = db.grades()
     all_scores = [m for g in grades if g["course_name"] == course_name for m in g["marks"]]
 
     if not all_scores:
