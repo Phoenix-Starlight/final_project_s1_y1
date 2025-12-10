@@ -2,6 +2,7 @@
 import db
 
 def get_course_summary(course_name):
+def generate_course_summary(course_name):
     grades = db.grades()
     all_scores = [
         m for g in grades if g["course_name"] == course_name for m in g["marks"]
@@ -25,7 +26,7 @@ def get_course_summary(course_name):
     }
 
 
-def get_student_performance_report(student_id):
+def generate_student_performance_report(student_id):
     courses = db.courses()
     students = db.students()
     grades = db.grades()
