@@ -1,31 +1,6 @@
 # Validating ID
 import db
 
-
-def is_valid_student(student_id):
-    # Any will return True if student_id exists within,it will be false otherwise.
-    students = db.students()
-    return any(s["id"] == student_id for s in students)
-
-
-def get_individual(student_id):
-    students = db.students()
-    grades = db.grades()
-
-    student = next((s for s in students if s["id"] == student_id), None)
-    if not student:
-        return None
-
-    student_grades = [g for g in grades if g["student_id"] == student_id]
-
-    return {
-        "id": student["id"],
-        "name": student["name"],
-        "email": student["email"],
-        "grades": student_grades,
-    }
-
-
 def get_course_summary(course_name):
     grades = db.grades()
     all_scores = [
