@@ -4,7 +4,7 @@ def export_report(students, courses, grades):
         print("1. Export Student Report")
         print("2. Export Course Report")
         print("3. Return to Main Menu")
-        choice = input("Select option(1/2/3):")
+        choice = input("Select option (1/2/3): ")
         if choice == "1":
             export_student_report(students, courses, grades)
         elif choice == "2":
