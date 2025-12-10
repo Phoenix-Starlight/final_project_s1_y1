@@ -5,15 +5,16 @@ def export_report(students, courses, grades):
         print("2. Export Course Report")
         print("3. Return to Main Menu")
         choice = input("Select option (1/2/3): ")
-        if choice == "1":
-            export_student_report(students, courses, grades)
-        elif choice == "2":
-            export_course_report(students, courses, grades)
-        elif choice == "3":
-            print("Returning to Main Menu")
-            break
-        else:
-            print("Invalid selection")
+        match choice:
+            case "1":
+                export_student_report(students, courses, grades)
+            case "2":
+                export_course_report(students, courses, grades)
+            case "3":
+                print("Returning to Main Menu")
+                break
+            case _:
+                print("Invalid selection")
 
 def export_student_report(students, courses, grades):
     student_id = input("Enter Student ID: ")
