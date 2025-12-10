@@ -69,16 +69,16 @@ def export_course_report(students, courses, grades):
     average = total / len(course_grades)
     filename = "Report_" + course_id + ".txt"
     with open(filename, "w") as f:
-    f.write("======= Course Summary Report =======" + "\n")
-    f.write("Course ID  : " + course_id + "\n")
-    f.write("Course Name: " + courses[course_id] + "\n")
-    f.write("\n------- Student Results -------\n")
-    for g in course_grades:
-        student_name = students[g["student_id"]]["name"]
-        f.write(f'{g["student_id"]} - {student_name}: {g["mark"]} ({g["grade"]})\n')
-    f.write("\n------- Statistics -------\n")
-    f.write("Average Mark: " + str(round(average, 2)) + "\n")
-    f.write("Highest Mark: " + str(highest) + "\n")
-    f.write("Lowest Mark: " + str(lowest) + "\n")
-    f.write("=====================================")
+        f.write("======= Course Summary Report =======" + "\n")
+        f.write("Course ID  : " + course_id + "\n")
+        f.write("Course Name: " + courses[course_id] + "\n")
+        f.write("\n------- Student Results -------\n")
+        for g in course_grades:
+            student_name = students[g["student_id"]]["name"]
+            f.write(f'{g["student_id"]} - {student_name}: {g["mark"]} ({g["grade"]})\n')
+        f.write("\n------- Statistics -------\n")
+        f.write("Average Mark: " + str(round(average, 2)) + "\n")
+        f.write("Highest Mark: " + str(highest) + "\n")
+        f.write("Lowest Mark: " + str(lowest) + "\n")
+        f.write("=====================================")
     print("Report saved as " + filename)
