@@ -44,7 +44,7 @@ def export_student_report(students, courses, grades):
             f.write(f'{g["course_id"]} - {course_name}: {g["mark"]} ({g["grade"]})\n')
         f.write("Average Mark: " + str(round(average, 2)) + "\n")
         f.write("==========================================")
-    print("Student report saved as " + filename)
+    print(f"Student report saved as {filename}")
 
 def export_course_report(students, courses, grades):
     course_id = input("Enter Course ID: ")
