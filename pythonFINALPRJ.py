@@ -50,7 +50,7 @@ def get_student_performance_report(student_id):
             "------- Course & Grades -------",
         ]
         + [
-            f"{g['course_id']} - {courses[g['course_id']]}: {g['mark']} ({g['grade']}"
+            f"{g['course_id']} - {courses[g['course_id']]}: {g['mark']} - ({g['letter_grade']})"
             for g in student_grades
         ]
         + [
