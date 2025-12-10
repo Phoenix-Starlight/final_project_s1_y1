@@ -1,30 +1,45 @@
 # Validating ID
 import db
+from export import get_average, get_highest_mark, get_lowest_mark
 
-def get_course_summary(course_name):
+
 def generate_course_summary(course_name):
+    students = db.students()
+    courses = db.courses()
     grades = db.grades()
+
     all_scores = [
         m for g in grades if g["course_name"] == course_name for m in g["marks"]
     ]
 
+
     if not all_scores:
-        return {
-            "course": course_name,
-            "average": None,
-            "highest": None,
-            "lowest": None,
-            "count": 0,
-        }
+        return "\n".join([
+            "======= Course Summary Report =======",
+            "Course ID  : " + courses.read(("name", course_name)),
+            "Course Name: " + course_name,
+            "------- Student Results -------",
+            "====================================="
+        ])
 
-    return {
-        "course": course_name,
-        "average": sum(all_scores) / len(all_scores),
-        "highest": max(all_scores),
-        "lowest": min(all_scores),
-        "count": len(all_scores),
-    }
+    average = round(get_average(grades), 2)
+    highest = get_highest_mark(grades)
+    lowest = get_lowest_mark(grades)
 
+    return "\n".join([
+        "======= Course Summary Report =======",
+        "Course ID  : " + courses.read(("name", course_name)),
+        "Course Name: " + course_name,
+        "\n------- Student Results -------\n"
+    ]
+    + [f'{g["student_id"]} - {students.read(("id", g["student_id"]))["name"]}: {g["mark"]} - ({g["letter_grade"]})\n' for g in grades]
+    + [
+        "\n------- Statistics -------\n",
+        f"Average Mark: {average}",
+        f"Highest Mark: {highest}",
+        f"Lowest Mark: {lowest}",
+        "====================================="
+    ])
 
 def generate_student_performance_report(student_id):
     courses = db.courses()
