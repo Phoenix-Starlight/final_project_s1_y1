@@ -5,7 +5,7 @@ Final Project for Programming Principles
 Design, implement, and present a program that manages student records (courses and grades) and display/export performance.
 
 # Progress
-- [ ] Flowchart
+- [x] Flowchart
 - [ ] Produce Program
 - [ ] Present
 
@@ -13,7 +13,7 @@ Design, implement, and present a program that manages student records (courses a
 - [ ] Exporting results to text files
 - [ ] Displaying results
 - [ ] Display summaries
-- [ ] Managing student records
+- [x] Managing student records
 
 # Methodology for Contribution Log
 1. Put work on fork/branch
@@ -22,6 +22,6 @@ Design, implement, and present a program that manages student records (courses a
 
 # Branches
 1. [Flowchart](../flow-chart)
-2. [Program](../gradebook)
+2. [Program](../main)
 
 Presentation will be hosted on Onedrive
