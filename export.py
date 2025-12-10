@@ -48,6 +48,14 @@ def export_student_report(students, courses, grades):
     print(f"Student report saved as {filename}")
     return True
 
+
+def sum_grades(course_grades):
+    total = 0
+    for g in course_grades:
+        total += g["mark"]
+    return total
+
+
 def export_course_report(students, courses, grades):
     course_id = input("Enter Course ID: ")
     if course_id not in courses:
@@ -60,16 +68,11 @@ def export_course_report(students, courses, grades):
     if len(course_grades) == 0:
         print("No grades found for this course, please enter again.")
         return False
-    total = 0
-    highest = course_grades[0]["mark"]
-    lowest = course_grades[0]["mark"]
-    for g in course_grades:
-        total += g["mark"]
-        if g["mark"] > highest:
-            highest = g["mark"]
-        if g["mark"] < lowest:
-            lowest = g["mark"]
-    average = total / len(course_grades)
+
+    highest = get_highest_mark(course_grades)
+    lowest = get_lowest_mark(course_grades)
+    average = get_average(course_grades)
+
     filename = f"Report_{course_id}.txt"
     with open(filename, "w") as f:
         f.write("======= Course Summary Report =======" + "\n")
@@ -86,3 +89,22 @@ def export_course_report(students, courses, grades):
         f.write("=====================================")
     print(f"Report saved as {filename}")
     return True
+
+
+def get_average(course_grades):
+    return sum_grades(course_grades) / len(course_grades)
+
+
+def get_highest_mark(course_grades):
+    highest = course_grades[0]["mark"]
+    for g in course_grades:
+        if g["mark"] > highest:
+            highest = g["mark"]
+    return highest
+
+def get_lowest_mark(course_grades):
+    lowest = course_grades[0]["mark"]
+    for g in course_grades:
+        if g["mark"] < lowest:
+            lowest = g["mark"]
+    return lowest
