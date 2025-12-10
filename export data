@@ -82,5 +82,4 @@ def export_course_report(students, courses, grades):
     f.write("Highest Mark: " + str(highest) + "\n")
     f.write("Lowest Mark: " + str(lowest) + "\n")
     f.write("=====================================")
-    f.close()
     print("Report saved as " + filename)
