@@ -67,7 +67,7 @@ def export_course_report(students, courses, grades):
         if g["mark"] < lowest:
             lowest = g["mark"]
     average = total / len(course_grades)
-    filename = "Report_" + course_id + ".txt"
+    filename = f"Report_{course_id}.txt"
     with open(filename, "w") as f:
         f.write("======= Course Summary Report =======" + "\n")
         f.write("Course ID  : " + course_id + "\n")
@@ -81,4 +81,4 @@ def export_course_report(students, courses, grades):
         f.write("Highest Mark: " + str(highest) + "\n")
         f.write("Lowest Mark: " + str(lowest) + "\n")
         f.write("=====================================")
-    print("Report saved as " + filename)
+    print(f"Report saved as {filename}")
