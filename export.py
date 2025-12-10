@@ -1,4 +1,4 @@
-def export_report(students, courses, grades):
+def export_report(students, courses, grades) -> bool | None:
     while True:
         print("\n---Export Performance Report---")
         print("1. Export Student Report")
@@ -7,27 +7,28 @@ def export_report(students, courses, grades):
         choice = input("Select option (1/2/3): ")
         match choice:
             case "1":
-                export_student_report(students, courses, grades)
+                return export_student_report(students, courses, grades)
             case "2":
-                export_course_report(students, courses, grades)
+                return export_course_report(students, courses, grades)
             case "3":
                 print("Returning to Main Menu")
                 break
             case _:
                 print("Invalid selection")
+    return None
 
 def export_student_report(students, courses, grades):
     student_id = input("Enter Student ID: ")
     if student_id not in students:
         print("Student not found, please enter again.")
-        return
+        return False
     student_grades = []
     for g in grades:
         if g["student_id"] == student_id:
             student_grades.append(g)
     if len(student_grades) == 0:
         print("No grades found for this student, please enter again.")
-        return
+        return False
     total = 0
     for g in student_grades:
         total += g["mark"]
@@ -45,19 +46,20 @@ def export_student_report(students, courses, grades):
         f.write("Average Mark: " + str(round(average, 2)) + "\n")
         f.write("==========================================")
     print(f"Student report saved as {filename}")
+    return True
 
 def export_course_report(students, courses, grades):
     course_id = input("Enter Course ID: ")
     if course_id not in courses:
         print("Course not found, please enter again.")
-        return
+        return False
     course_grades = []
     for g in grades:
         if g["course_id"] == course_id:
             course_grades.append(g)
     if len(course_grades) == 0:
         print("No grades found for this course, please enter again.")
-        return
+        return False
     total = 0
     highest = course_grades[0]["mark"]
     lowest = course_grades[0]["mark"]
@@ -83,3 +85,4 @@ def export_course_report(students, courses, grades):
         f.write("Lowest Mark: " + str(lowest) + "\n")
         f.write("=====================================")
     print(f"Report saved as {filename}")
+    return True
