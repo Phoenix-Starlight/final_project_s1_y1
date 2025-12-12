@@ -48,6 +48,16 @@ def generate_student_performance_report(student_id):
 
     student_grades = grades.read(("student_id", student_id))
 
+    if not student_grades:
+        return "\n".join([
+            "======= Student Performance Report =======",
+            f"Student ID: {student_id}",
+            f"Name      : {students[student_id]['name']}",
+            f"Email     : {students[student_id]['email']}",
+            "------- Course & Grades -------",
+            "==========================================",
+        ])
+
     total = 0
     for g in student_grades:
         total += g["mark"]
