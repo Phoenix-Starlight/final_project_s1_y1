@@ -8,6 +8,13 @@ from reports import generate_student_performance_report, generate_course_summary
 
 # main function
 
+def validate_student_details(student_id, name, email):
+    try:
+        int(student_id)
+        return "@" in email and "." in email
+    except ValueError:
+        return False
+
 def add_new_student():
     print("Option 1: Add New Student")
     print("Input Student Details:\n")
@@ -16,6 +23,11 @@ def add_new_student():
     name = input("Name: ").strip()
     email = input("Email: ").strip()
 
+    if not validate_student_details(student_id, name, email):
+        print(f"Invalid student details for student id {student_id} or email {email}")
+        return
+
+    id = int(student_id)
 
     db = students()
     existing = db.read(("id", student_id))
@@ -23,7 +35,7 @@ def add_new_student():
         print(f"Error: Student ID {student_id} already exists!")
         return
 
-    student = Student(student_id, name, email)
+    student = Student(id, name, email)
     with db:
         db.insert(student)
     print(f"Student {name} added successfully!")
@@ -56,7 +68,18 @@ def record_student_marks():
     student_id = input("Student ID: ").strip()
     course_id = input("Course ID: ").strip()
 
-    student = student_db.read(("id", student_id))
+
+    try:
+        id = int(student_id)
+    except ValueError:
+        print("Invalid student ID! Should be a number.")
+        return
+
+    if not course_id.isalnum():
+        print("Invalid Course ID! Should be alphanumeric")
+        return
+
+    student = student_db.read(("id", id))
     if not student:
         print(f"Error: Student ID {student_id} not found!")
         return
@@ -87,14 +110,20 @@ def record_student_marks():
 def display_student_performance():
     print("Option 4: Display Student Performance")
     print("Select Student\n")
-    
+
     student_id = input("Student ID: ").strip()
 
-    if not students().read(("id", student_id)):
+    try:
+        id = int(student_id)
+    except ValueError:
+        print("Invalid student ID! Should be a number.")
+        return
+
+    if not students().read(("id", id)):
         print("Student not found, please enter again.")
         return
 
-    print(generate_student_performance_report(student_id))
+    print(generate_student_performance_report(id))
 
 def display_course_summary():
     print("Option 5: Display Course Summary")
@@ -178,5 +207,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
-
