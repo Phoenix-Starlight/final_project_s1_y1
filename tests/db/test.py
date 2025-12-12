@@ -206,6 +206,7 @@ def test_grade_insertion():
     insert_first_record(students)
     with courses:
         courses.insert(db.Course("CSC1204", "Programming Principles"))
+        courses.insert(db.Course("CSC1205", "Programming"))
 
     print(f"Creating {db.data_dir}/grades.txt")
     grades = db.grades()
@@ -214,7 +215,8 @@ def test_grade_insertion():
 
     with grades:
         marks = [0, 100]
-        grades.insert(db.Grade(0, "Programming Principles", marks, letter_grade(marks)))
+        grades.insert(db.Grade(f"{0}+Programming Principles", marks, letter_grade(marks)))
+        grades.insert(db.Grade(f"{0}+Programming", marks, letter_grade(marks)))
 
 
 test_grade_insertion()
