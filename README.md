@@ -10,9 +10,9 @@ Design, implement, and present a program that manages student records (courses a
 - [ ] Present
 
 ## Features
-- [ ] Exporting results to text files
-- [ ] Displaying results
-- [ ] Display summaries
+- [x] Exporting results to text files
+- [x] Displaying results
+- [x] Display summaries
 - [x] Managing student records
 
 # Methodology for Contribution Log
