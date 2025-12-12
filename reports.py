@@ -46,10 +46,6 @@ def generate_student_performance_report(student_id):
     students = db.students()
     grades = db.grades()
 
-    if not students.read(("id", student_id)):
-        (print("Student not found, please enter again."),)
-        return None
-
     student_grades = grades.read(("student_id", student_id))
 
     total = 0

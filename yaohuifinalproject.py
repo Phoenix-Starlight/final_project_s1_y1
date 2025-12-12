@@ -2,6 +2,8 @@ import os
 
 from db import students, Student, courses, Course, grades
 from db.schema import letter_grade as grade
+from export import export_course_report, export_student_report
+from reports import generate_student_performance_report, generate_course_summary
 
 
 # main function
@@ -85,29 +87,8 @@ def display_student_performance():
     if not students().read(("id", student_id)):
         print("Student not found, please enter again.")
         return
-    
-    print(f"\nStudent: {student.name} ({student.id})")
-    print("=" * 40)
-    
-    grades = read_grades()
-    student_grades = [g for g in grades if g.student_id == student_id]
-    
-    if not student_grades:
-        print("No grades recorded yet.")
-        return
-    
-    for grade in student_grades:
-        course = get_course_by_name(grade.course_name)
-        course_id = course.id if course else "N/A"
-        
-        marks_str = ", ".join(str(mark) for mark in grade.marks) if grade.marks else "No marks"
-        average = sum(grade.marks)/len(grade.marks) if grade.marks else 0
-        
-        print(f"\nCourse: {grade.course_name} ({course_id})")
-        print(f"  Marks: {marks_str}")
-        if grade.marks:
-            print(f"  Average: {average:.2f}")
-        print(f"  Letter Grade: {grade.letter_grade}")
+
+    print(generate_student_performance_report(student_id))
 
 def display_course_summary():
     print("Option 5: Display Course Summary")
