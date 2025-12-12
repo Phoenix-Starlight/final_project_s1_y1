@@ -1,21 +1,4 @@
-def export_report(students, courses, grades) -> bool | None:
-    while True:
-        print("\n---Export Performance Report---")
-        print("1. Export Student Report")
-        print("2. Export Course Report")
-        print("3. Return to Main Menu")
-        choice = input("Select option (1/2/3): ")
-        match choice:
-            case "1":
-                return export_student_report(students, courses, grades)
-            case "2":
-                return export_course_report(students, courses, grades)
-            case "3":
-                print("Returning to Main Menu")
-                break
-            case _:
-                print("Invalid selection")
-    return None
+
 
 def export_student_report(students, courses, grades):
     student_id = input("Enter Student ID: ")
