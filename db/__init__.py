@@ -74,7 +74,6 @@ class Database[T: Unique]:
         self._index: IndexReference = dict(
             create_indexes(self._unique_columns, cold_storage)
         )
-        self._fd: TextIO | None = None
 
     @property
     def db(self):
@@ -155,19 +154,16 @@ class Database[T: Unique]:
 
     # Enables `with` syntax
     def __enter__(self):
-        self._fd = open(self.file, "r+")
         return self
 
     def __exit__(self, type, _, __):
         if type:
             print(f"State of database: {self._db}")
         # We know this is not None because __exit__ is only called after __enter__
-        fd = cast(TextIO, self._fd)
-        # Empty database
-        fd.truncate(0)
-        self._write_db(fd)
-        fd.close()
-        self._fd = None
+        with open(self.file, "r+") as fd:
+            # Empty database
+            fd.truncate(0)
+            self._write_db(fd)
 
 
 def generate_content(db: Iterable[T]):
