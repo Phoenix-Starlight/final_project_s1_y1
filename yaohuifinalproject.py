@@ -35,7 +35,10 @@ def add_new_course():
     course_id = input("Course ID: ").strip()
     course_name = input("Course Name: ").strip()
 
-    # Want to differentiate
+    if not course_id.isalnum():
+        print("Invalid Course ID! Should be alphanumeric")
+        return
+
     with courses() as db:
         course = Course(course_id, course_name)
         db.insert(course)
