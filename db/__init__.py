@@ -6,6 +6,7 @@ from typing import (
     Any,
     Callable,
     Iterable,
+    Self,
     Sequence,
     TextIO,
     Type,
@@ -59,6 +60,12 @@ def load_db[T](
         ]
 
 
+def _validate(db, object):
+    for k in db._unique_columns:
+        if (v := object[k]) in db._index[k]:
+            raise BadIndex(k, v, object, db.insert)
+
+
 class Database[T: Unique]:
     def __init__(self, file: str, structure: Type[T]) -> None:
         self.type = structure
@@ -79,16 +86,14 @@ class Database[T: Unique]:
     def db(self):
         return [record for record in self._db if record is not None]
 
-    def insert(self, object: T):
+    def insert(self, object: T, validate: Callable[[Self, T], None] = _validate):
         if (t := type(object)) is not self.type:
             raise TypeError(f"{object} of type {t} does not match type {self.type}")
-        for k in self._unique_columns:
-            if (v := object[k]) in self._index[k]:
-                raise BadIndex(k, v, object, self.insert)
+        validate(self, object)
         self._db.append(object)
         i = len(self._db) - 1
         for k in self._unique_columns:
-            self._index[k][object[k]] = lambda: i
+            self._index[k][object[k]] = i
 
     def update(self, id: tuple[str, Any], obj: T) -> bool:
         if (record := self.read(id)) is None:
@@ -101,12 +106,15 @@ class Database[T: Unique]:
         ]
         if len(exceptions) > 0:
             raise ExceptionGroup(
-                "Uniquness was violated",
+                "Uniqueness was violated",
                 exceptions,
             )
 
+        # Given that all indexes point to the same record in the list, we access the list and modify in place
         ref = self._index[id[0]][id[1]]
-        self._db[ref()] = obj
+
+        self._db[ref] = obj
+
         return True
 
     def delete(self, id: tuple[str, Any]) -> bool:
@@ -118,8 +126,8 @@ class Database[T: Unique]:
         for k, v in {k: record[k] for k in self._unique_columns}.items():
             ref = self._index[k][v]
             if index == -1:
-                index = ref()
-            elif index != ref():
+                index = ref
+            elif index != ref:
                 raise BadIndex(id[0], id[1], record, self.delete)
             del self._index[k][v]
 
@@ -128,7 +136,8 @@ class Database[T: Unique]:
 
     def read(self, id: tuple[str, Any]) -> T | None:
         if id[0] in self._index and id[1] in (index := self._index[id[0]]):
-            return self._db[index[id[1]]()]
+            return self._db[index[id[1]]]
+        return None
 
     def _initialize_db(self, path: str):
         with open(path, "a+") as file:
@@ -165,6 +174,9 @@ class Database[T: Unique]:
             fd.truncate(0)
             self._write_db(fd)
 
+    def __iter__(self):
+        yield from self.db
+
 
 def generate_content(db: Iterable[T]):
     return [
@@ -195,6 +207,7 @@ def resolve_type(t: Type[Any] | str | Any) -> Callable[..., Any]:
         case _:
             return t
 
+
 data_dir = "data"
 
 
@@ -207,26 +220,31 @@ def data(x):
 
 
 @data
-def students():
+def students() -> Database[Student]:
     return Database("data/students.txt", Student)
 
 
 @data
-def courses():
+def courses() -> Database[Course]:
     return Database("data/courses.txt", Course)
 
-
 @data
-def grades():
+def grades() -> Database[Grade]:
     def enforce_dependence(insert: Callable[[Grade], None]):
         def hold_insert_func(self: Database[Grade], object: Grade):
             student_db = students()
             course_db = courses()
-            if not student_db.read(("id", object.student_id)) or not course_db.read(
-                ("name", object.course_name)
+
+            if "+" not in object.student_id_and_course_name:
+                raise ValueError(f"Record {object} does not have a composite key represented by `id+name` where id is in `students.txt` and name belongs to `courses.txt`")
+
+            student_id, course_name = tuple(object.student_id_and_course_name.split("+"))
+            id = int(student_id)
+            if not student_db.read(("id", id)) or not course_db.read(
+                ("name", course_name)
             ):
                 raise ValueError(
-                    f"Record {object} does not have respective keys present in `students.txt` or `courses.txt`"
+                    f"Record {object} does not have respective keys {(student_id, course_name)} present in `students.txt` or `courses.txt`"
                 )
             insert(object)
 

@@ -118,13 +118,13 @@ def delete_jane(students):
         repeat_attempt = students.delete(id_identifier)
 
         result = students.read(id_identifier) is None
-        print(f"students.read(id_identifier) is None? {result}")
+        print(f"students.read({id_identifier}) is None? {result}")
         success |= attempt and not repeat_attempt and result
     # Reopen to flush changes and use new database to ensure it is in sync with disk
     print("Close and reopen database")
     with db.students() as students:
         result = students.read(id_identifier) is None
-        print(f"students.read(id_identifier) is None? {result}")
+        print(f"students.read({id_identifier}) is None? {result}")
         success &= result
     if not success:
         raise AssertionError()
@@ -163,9 +163,9 @@ def test_update_then_delete():
     print(f"Creating {db.data_dir}/students.txt")
     for test in [insert_first_record, update_name, insert_second_record, delete_jane]:
         test(db.students())
-
+    tests = test_results
     test_results = original_test_results
-    if any(not v for v in test_results.values()):
+    if any(not v for v in tests.values()):
         raise AssertionError()
 
 
@@ -202,7 +202,7 @@ def test_grade_insertion():
     students = db.students()
     courses = db.courses()
 
-    # Aready tested
+    # Already tested
     insert_first_record(students)
     with courses:
         courses.insert(db.Course("CSC1204", "Programming Principles"))
@@ -210,13 +210,11 @@ def test_grade_insertion():
     print(f"Creating {db.data_dir}/grades.txt")
     grades = db.grades()
 
+    test_results = original_test_results
+
     with grades:
         marks = [0, 100]
         grades.insert(db.Grade(0, "Programming Principles", marks, letter_grade(marks)))
-
-    test_results = original_test_results
-    if any(not v for v in test_results.values()):
-        raise AssertionError()
 
 
 test_grade_insertion()
@@ -250,7 +248,7 @@ def test_grade_insertion_fail():
 
     with grades:
         marks = [0, 100]
-        grades.insert(db.Grade(0, "CSC1204", marks, letter_grade(marks)))
+        grades.insert(db.Grade(f"{0}+CSC1204", marks, letter_grade(marks)))
 
     test_results = original_test_results
     if any(not v for v in test_results.values()):
@@ -274,4 +272,4 @@ if (failed_tests := len(categorized_test_results[False])) == 0:
     exit()
 
 print(f"{failed_tests}/{len(test_results)} TESTS FAILED")
-print(*[f"- Test `{failed_test}`" for failed_test in categorized_test_results[False]])
+print(*[f"- Test `{failed_test}`\n" for failed_test in categorized_test_results[False]])
