@@ -51,32 +51,32 @@ def record_student_marks():
     student_id = input("Student ID: ").strip()
     course_id = input("Course ID: ").strip()
 
-                student = student_db.read(("id", student_id))
-                if not student:
-                    print(f"Error: Student ID {student_id} not found!")
-                    return
+    student = student_db.read(("id", student_id))
+    if not student:
+        print(f"Error: Student ID {student_id} not found!")
+        return
 
-                course = course_db.read(("id", course_id))
-                if not course:
-                    print(f"Error: Course ID {course_id} not found!")
-                    return
+    course = course_db.read(("id", course_id))
+    if not course:
+        print(f"Error: Course ID {course_id} not found!")
+        return
 
-                marks_input = input("Enter marks (separate multiple marks with spaces): ").strip()
+    marks_input = input("Enter marks (separate multiple marks with spaces): ").strip()
 
-                if marks_input:
-                    try:
-                        marks = [int(mark) for mark in marks_input.split()]
-                    except ValueError:
-                        print("Error: Please enter valid numbers!")
-                        return
-                else:
-                    marks = []
+    if marks_input:
+        try:
+            marks = [int(mark) for mark in marks_input.split()]
+        except ValueError:
+            print("Error: Please enter valid numbers!")
+            return
+    else:
+        marks = []
 
-                letter_grade = grade(marks)
+    letter_grade = grade(marks)
 
                 grade_db.insert(student_id, course.name, marks, letter_grade)
 
-                print(f"Marks recorded successfully! Letter Grade: {letter_grade}")
+    print(f"Marks recorded successfully! Letter Grade: {letter_grade}")
 
 def display_student_performance():
     print("Option 4: Display Student Performance")
@@ -108,7 +108,6 @@ def display_course_summary():
 
 
 def export_report():
-    
     print("Option 6: Export Report")
     print("Select Report Type\n")
 
