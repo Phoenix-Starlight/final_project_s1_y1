@@ -16,13 +16,15 @@ def add_new_student():
     name = input("Name: ").strip()
     email = input("Email: ").strip()
 
-    with students() as db:
-        existing = db.read(("id", student_id))
-        if existing:
-            print(f"Error: Student ID {student_id} already exists!")
-            return
 
-        student = Student(student_id, name, email)
+    db = students()
+    existing = db.read(("id", student_id))
+    if existing:
+        print(f"Error: Student ID {student_id} already exists!")
+        return
+
+    student = Student(student_id, name, email)
+    with db:
         db.insert(student)
     print(f"Student {name} added successfully!")
 
@@ -74,7 +76,8 @@ def record_student_marks():
 
     letter_grade = grade(marks)
 
-                grade_db.insert(student_id, course.name, marks, letter_grade)
+    with grade_db:
+        grade_db.insert(student_id, course.name, marks, letter_grade)
 
     print(f"Marks recorded successfully! Letter Grade: {letter_grade}")
 
