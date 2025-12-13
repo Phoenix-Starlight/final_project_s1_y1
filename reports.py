@@ -3,11 +3,7 @@ import db
 from export import get_average, get_highest_mark, get_lowest_mark
 
 
-def generate_course_summary(course_name):
-    students = db.students()
-    courses = db.courses()
-    grades = db.grades()
-
+def generate_course_summary(students, courses, grades, course_name):
     all_scores = [
         m for g in grades if g["course_name"] == course_name for m in g["marks"]
     ]
@@ -41,11 +37,7 @@ def generate_course_summary(course_name):
         "====================================="
     ])
 
-def generate_student_performance_report(student_id):
-    courses = db.courses()
-    students = db.students()
-    grades = db.grades()
-
+def generate_student_performance_report(courses, students, grades, student_id):
     student_grades = grades.read(("student_id", student_id))
 
     if not student_grades:
