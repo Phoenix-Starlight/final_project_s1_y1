@@ -1,6 +1,5 @@
 # Validating ID
 import db
-from export import get_average, get_highest_mark, get_lowest_mark
 
 
 def generate_course_summary(students, courses, grades, course_name):
@@ -78,3 +77,30 @@ def generate_student_performance_report(courses, students, grades, student_id):
             "==========================================",
         ]
     )
+
+
+def get_average(course_grades):
+    return sum_grades(course_grades) / len(course_grades)
+
+
+def get_highest_mark(course_grades):
+    highest = course_grades[0]["mark"]
+    for g in course_grades:
+        if g["mark"] > highest:
+            highest = g["mark"]
+    return highest
+
+
+def get_lowest_mark(course_grades):
+    lowest = course_grades[0]["mark"]
+    for g in course_grades:
+        if g["mark"] < lowest:
+            lowest = g["mark"]
+    return lowest
+
+
+def sum_grades(course_grades):
+    total = 0
+    for g in course_grades:
+        total += g["mark"]
+    return total
