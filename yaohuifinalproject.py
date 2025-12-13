@@ -1,6 +1,6 @@
 import os
 
-from db import students, Student, courses, Course, grades
+from db import students, Student, courses, Course, grades, Grade
 from db.schema import letter_grade as grade
 from export import export_course_report, export_student_report
 from reports import generate_student_performance_report, generate_course_summary
@@ -24,7 +24,7 @@ def add_new_student():
     email = input("Email: ").strip()
 
     if not validate_student_details(student_id, name, email):
-        print(f"Invalid student details for student id {student_id} or email {email}")
+        print(f"Invalid student details for student id `{student_id}` or email `{email}`")
         return
 
     id = int(student_id)
@@ -48,8 +48,11 @@ def add_new_course():
     course_name = input("Course Name: ").strip()
 
     if not course_id.isalnum():
-        print("Invalid Course ID! Should be alphanumeric")
+        print("Invalid Course ID! Should be alphanumeric.")
         return
+
+    if not course_name.isalpha():
+        print("Invalid Course Name! Must use alphabet and not be empty.")
 
     with courses() as db:
         course = Course(course_id, course_name)
@@ -76,7 +79,7 @@ def record_student_marks():
         return
 
     if not course_id.isalnum():
-        print("Invalid Course ID! Should be alphanumeric")
+        print("Invalid Course ID! Should be alphanumeric.")
         return
 
     student = student_db.read(("id", id))
@@ -103,7 +106,7 @@ def record_student_marks():
     letter_grade = grade(marks)
 
     with grade_db:
-        grade_db.insert(f"{student_id}+{course.name}", marks, letter_grade)
+        grade_db.insert(Grade(f"{student_id}+{course.name}", marks, grade(marks)))
 
     print(f"Marks recorded successfully! Letter Grade: {letter_grade}")
 
@@ -123,7 +126,7 @@ def display_student_performance():
         print("Student not found, please enter again.")
         return
 
-    print(generate_student_performance_report(id))
+    print(generate_student_performance_report(students(), courses(), grades(), id))
 
 def display_course_summary():
     print("Option 5: Display Course Summary")
@@ -139,7 +142,7 @@ def display_course_summary():
         print(f"Error: Course ID {course_id} not found!")
         return
 
-    print(generate_course_summary(course_id))
+    print(generate_course_summary(students(), courses(), grades(), course_id))
 
 
 def export_report():
@@ -153,9 +156,25 @@ def export_report():
         choice = input("Select option (1/2/3): ")
         match choice:
             case "1":
-                return export_student_report(students(), courses(), grades())
+                student_id = input("Enter Student ID: ")
+
+                try:
+                    id = int(student_id)
+                except ValueError:
+                    print("Invalid student ID! Should be a number.")
+                    return
+
+                if not students().read(("id", id)):
+                    print("Student not found, please enter again.")
+                    return False
+                return export_student_report(students(), courses(), grades(), id)
             case "2":
-                return export_course_report(students(), courses(), grades())
+                course_id = input("Enter Course ID: ")
+
+                if not course_id.isalnum():
+                    print("Invalid Course ID! Should be alphanumeric.")
+
+                return export_course_report(students(), courses(), grades(), None)
             case "3":
                 print("Returning to Main Menu")
                 break
