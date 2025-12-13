@@ -16,7 +16,6 @@ def export_student_report(students, courses, grades):
     total = 0
     for g in student_grades:
         total += g["mark"]
-    average = total / len(student_grades)
     filename = "Report_" + student_id + ".txt"
     with open(filename, "w") as f:
         f.write(generate_student_performance_report(students, courses, grades, student_id))
@@ -45,7 +44,7 @@ def export_course_report(students, courses, grades):
 
     filename = f"Report_{course_id}.txt"
     with open(filename, "w") as f:
-        f.write(generate_course_summary(students, courses, grades))
+        f.write(generate_course_summary(students, courses, grades, course_id))
     print(f"Report saved as {filename}")
     return True
 
