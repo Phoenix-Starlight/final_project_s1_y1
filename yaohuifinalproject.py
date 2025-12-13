@@ -24,7 +24,7 @@ def add_new_student():
     email = input("Email: ").strip()
 
     if not validate_student_details(student_id, name, email):
-        print(f"Invalid student details for student id {student_id} or email {email}")
+        print(f"Invalid student details for student id `{student_id}` or email `{email}`")
         return
 
     id = int(student_id)
@@ -48,8 +48,11 @@ def add_new_course():
     course_name = input("Course Name: ").strip()
 
     if not course_id.isalnum():
-        print("Invalid Course ID! Should be alphanumeric")
+        print("Invalid Course ID! Should be alphanumeric.")
         return
+
+    if not course_name.isalpha():
+        print("Invalid Course Name! Must use alphabet and not be empty.")
 
     with courses() as db:
         course = Course(course_id, course_name)
@@ -76,7 +79,7 @@ def record_student_marks():
         return
 
     if not course_id.isalnum():
-        print("Invalid Course ID! Should be alphanumeric")
+        print("Invalid Course ID! Should be alphanumeric.")
         return
 
     student = student_db.read(("id", id))
