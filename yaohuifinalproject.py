@@ -153,9 +153,25 @@ def export_report():
         choice = input("Select option (1/2/3): ")
         match choice:
             case "1":
-                return export_student_report(students(), courses(), grades())
+                student_id = input("Enter Student ID: ")
+
+                try:
+                    id = int(student_id)
+                except ValueError:
+                    print("Invalid student ID! Should be a number.")
+                    return
+
+                if not students().read(("id", id)):
+                    print("Student not found, please enter again.")
+                    return False
+                return export_student_report(students(), courses(), grades(), id)
             case "2":
-                return export_course_report(students(), courses(), grades())
+                course_id = input("Enter Course ID: ")
+
+                if not course_id.isalnum():
+                    print("Invalid Course ID! Should be alphanumeric.")
+
+                return export_course_report(students(), courses(), grades(), None)
             case "3":
                 print("Returning to Main Menu")
                 break

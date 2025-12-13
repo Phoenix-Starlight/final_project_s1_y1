@@ -1,20 +1,6 @@
 from reports import generate_course_summary, generate_student_performance_report
 
 
-    student_id = input("Enter Student ID: ")
-    if student_id not in students:
-        print("Student not found, please enter again.")
-        return False
-    student_grades = []
-    for g in grades:
-        if g["student_id"] == student_id:
-            student_grades.append(g)
-    if len(student_grades) == 0:
-        print("No grades found for this student, please enter again.")
-        return False
-    total = 0
-    for g in student_grades:
-        total += g["mark"]
 def export_student_report(students, courses, grades, student_id):
     filename = "Report_" + student_id + ".txt"
     with open(filename, "w") as f:
