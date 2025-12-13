@@ -1,12 +1,11 @@
-# Validating ID
-import db
+from typing import Iterable
+from db import Grade, Database, Course
 
 
-def generate_course_summary(students, courses, grades, course_name):
+def generate_course_summary(students, courses, grades: Database[Grade], course_name):
     all_scores = [
-        m for g in grades if g["course_name"] == course_name for m in g["marks"]
+        m for g in grades if g.student_id_and_course_name.split("+")[1] == course_name for m in g.marks
     ]
-
 
     if not all_scores:
         return "\n".join([
@@ -17,9 +16,10 @@ def generate_course_summary(students, courses, grades, course_name):
             "====================================="
         ])
 
-    average = round(get_average(grades), 2)
-    highest = get_highest_mark(grades)
-    lowest = get_lowest_mark(grades)
+    averages = [get_average(grade.marks) for grade in grades]
+    average = round(sum(averages) / len(averages), 2)
+    highest = get_highest_mark(averages)
+    lowest = get_lowest_mark(averages)
 
     return "\n".join([
         "======= Course Summary Report =======",
@@ -36,8 +36,8 @@ def generate_course_summary(students, courses, grades, course_name):
         "====================================="
     ])
 
-def generate_student_performance_report(courses, students, grades, student_id):
-    student_grades = grades.read(("student_id", student_id))
+def generate_student_performance_report(students, courses: Database[Course], grades: Database[Grade], student_id):
+    student_grades = [grade for grade in grades.db if str(student_id) in grade.student_id_and_course_name]
 
     if not student_grades:
         return "\n".join([
@@ -49,11 +49,6 @@ def generate_student_performance_report(courses, students, grades, student_id):
             "==========================================",
         ])
 
-    total = 0
-    for g in student_grades:
-        total += g["mark"]
-    average = total / len(student_grades)
-
     return "\n".join(
         [
             "======= Student Performance Report =======",
@@ -63,44 +58,37 @@ def generate_student_performance_report(courses, students, grades, student_id):
             "------- Course & Grades -------",
         ]
         + [
-            f"{g['course_id']} - {courses[g['course_id']]}: {g['mark']} - ({g['letter_grade']})"
+            f"{courses.read(("name", course_name)).id} - {course_name}: {g.marks} - {get_average(g.marks)} ({g.letter_grade})"
             for g in student_grades
-        ]
-        + [
-            "Average Mark: "
-            + str(
-                round(
-                    average,
-                    2,
-                )
-            ),
+            for student_id, course_name in [tuple(g.student_id_and_course_name.split("+"))]
+        ] + [
             "==========================================",
         ]
     )
 
 
-def get_average(course_grades):
-    return sum_grades(course_grades) / len(course_grades)
+def get_average(grades):
+    return sum_grades(grades) / len(grades)
 
 
-def get_highest_mark(course_grades):
-    highest = course_grades[0]["mark"]
-    for g in course_grades:
-        if g["mark"] > highest:
-            highest = g["mark"]
+def get_highest_mark(grades):
+    highest = grades[0]
+    for g in grades:
+        if g > highest:
+            highest = g
     return highest
 
 
-def get_lowest_mark(course_grades):
-    lowest = course_grades[0]["mark"]
-    for g in course_grades:
-        if g["mark"] < lowest:
-            lowest = g["mark"]
+def get_lowest_mark(grades):
+    lowest = grades[0]
+    for g in grades:
+        if g < lowest:
+            lowest = g
     return lowest
 
 
-def sum_grades(course_grades):
+def sum_grades(grades: Iterable[int]):
     total = 0
-    for g in course_grades:
-        total += g["mark"]
+    for g in grades:
+        total += g
     return total

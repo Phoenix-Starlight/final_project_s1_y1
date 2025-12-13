@@ -126,7 +126,7 @@ def display_student_performance():
         print("Student not found, please enter again.")
         return
 
-    print(generate_student_performance_report(id))
+    print(generate_student_performance_report(students(), courses(), grades(), id))
 
 def display_course_summary():
     print("Option 5: Display Course Summary")
@@ -142,7 +142,7 @@ def display_course_summary():
         print(f"Error: Course ID {course_id} not found!")
         return
 
-    print(generate_course_summary(course_id))
+    print(generate_course_summary(students(), courses(), grades(), course_id))
 
 
 def export_report():
