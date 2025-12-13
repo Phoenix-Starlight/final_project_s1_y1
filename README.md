@@ -6,7 +6,7 @@ Design, implement, and present a program that manages student records (courses a
 
 # Progress
 - [x] Flowchart
-- [ ] Produce Program
+- [x] Produce Program
 - [ ] Present
 
 ## Features
@@ -24,4 +24,4 @@ Design, implement, and present a program that manages student records (courses a
 1. [Flowchart](../flow-chart)
 2. [Program](../main)
 
-Presentation will be hosted on Onedrive
+Presentation will be hosted on Onedrive.
