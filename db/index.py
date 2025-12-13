@@ -2,9 +2,9 @@ from typing import Any, Callable, Iterable, TypeVar
 
 from .schema import Unique
 
-# Maintain a dynamically solved reference for easy updates
-# Makes deletion harder
-Index = dict[Any, Callable[[], int]]
+# Maintain a pointer for easy updates
+# Means deletions need to set the value to None
+Index = dict[Any, int]
 IndexReference = dict[str, Index]
 
 
@@ -27,5 +27,5 @@ def create_index(db: Iterable[T], key: str):
     for i, record in enumerate(db):
         if (v := record[key]) in index:
             raise BadIndex(key, v, record, create_index)
-        index[v] = lambda: (i)
+        index[v] = i
     return index

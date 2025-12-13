@@ -103,7 +103,7 @@ def record_student_marks():
     letter_grade = grade(marks)
 
     with grade_db:
-        grade_db.insert(student_id, course.name, marks, letter_grade)
+        grade_db.insert(f"{student_id}+{course.name}", marks, letter_grade)
 
     print(f"Marks recorded successfully! Letter Grade: {letter_grade}")
 

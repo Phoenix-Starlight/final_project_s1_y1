@@ -16,7 +16,7 @@ def generate_course_summary(course_name):
     if not all_scores:
         return "\n".join([
             "======= Course Summary Report =======",
-            "Course ID  : " + courses.read(("name", course_name)),
+            f"Course ID  : {courses.read(("name", course_name))}",
             "Course Name: " + course_name,
             "------- Student Results -------",
             "====================================="
@@ -28,7 +28,7 @@ def generate_course_summary(course_name):
 
     return "\n".join([
         "======= Course Summary Report =======",
-        "Course ID  : " + courses.read(("name", course_name)),
+        f"Course ID  : {courses.read(("name", course_name))}",
         "Course Name: " + course_name,
         "\n------- Student Results -------\n"
     ]
@@ -52,8 +52,8 @@ def generate_student_performance_report(student_id):
         return "\n".join([
             "======= Student Performance Report =======",
             f"Student ID: {student_id}",
-            f"Name      : {students[student_id]['name']}",
-            f"Email     : {students[student_id]['email']}",
+            f"Name      : {students.read(("id", student_id)).name}",
+            f"Email     : {students.read(("id", student_id)).email}",
             "------- Course & Grades -------",
             "==========================================",
         ])
@@ -67,8 +67,8 @@ def generate_student_performance_report(student_id):
         [
             "======= Student Performance Report =======",
             f"Student ID: {student_id}",
-            f"Name      : {students[student_id]['name']}",
-            f"Email     : {students[student_id]['email']}",
+            f"Name      : {students.read(("id", student_id)).name}",
+            f"Email     : {students.read(("id", student_id)).name}",
             "------- Course & Grades -------",
         ]
         + [

@@ -24,8 +24,7 @@ class Course(Unique):
 
 @dataclass(frozen=True)
 class Grade(Unique):
-    student_id: int
-    course_name: str
+    student_id_and_course_name: str
     marks: list[int]
     letter_grade: str
 
@@ -60,5 +59,5 @@ def letter_grade(marks: list[int]):
 unique_keys: dict[type, list[str]] = {
     Student: ["id", "email"],
     Course: ["id", "name"],
-    Grade: ["student_id", "course_name"],
+    Grade: ["student_id_and_course_name"],
 }

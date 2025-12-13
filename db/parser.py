@@ -26,7 +26,7 @@ def parse_array(arr: str, type: Callable[..., Any]) -> list | None:
         # convert array to list[T]
         if typing.get_origin(type) is not list:
             raise TypeError("Bad schema: expected parameterized list")
-        element_type: Callable[[str],] = typing.get_args(type)[0]
+        element_type: Callable[[str], list] = typing.get_args(type)[0]
         return [element_type(e) for e in array]
     return None
 
