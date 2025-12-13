@@ -2,7 +2,7 @@ from reports import generate_course_summary, generate_student_performance_report
 
 
 def export_student_report(students, courses, grades, student_id):
-    filename = "Report_" + student_id + ".txt"
+    filename = f"Report_{student_id}.txt"
     with open(filename, "w") as f:
         f.write(generate_student_performance_report(students, courses, grades, student_id))
     return True
