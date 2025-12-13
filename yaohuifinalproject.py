@@ -1,6 +1,6 @@
 import os
 
-from db import students, Student, courses, Course, grades
+from db import students, Student, courses, Course, grades, Grade
 from db.schema import letter_grade as grade
 from export import export_course_report, export_student_report
 from reports import generate_student_performance_report, generate_course_summary
@@ -103,7 +103,7 @@ def record_student_marks():
     letter_grade = grade(marks)
 
     with grade_db:
-        grade_db.insert(f"{student_id}+{course.name}", marks, letter_grade)
+        grade_db.insert(Grade(f"{student_id}+{course.name}", marks, grade(marks)))
 
     print(f"Marks recorded successfully! Letter Grade: {letter_grade}")
 
