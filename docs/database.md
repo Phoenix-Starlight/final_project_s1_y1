@@ -6,20 +6,22 @@
 5. [Schemas](#schema-declaration)
 6. [Database specification](#database-specification)
 # Usage
+
 ```py
+import db.data
 import db
 from db.schema import letter_grade
 
-students = db.students()
-courses = db.courses()
-grades = db.grades()
+students = db.data.students()
+courses = db.data.courses()
+grades = db.data.grades()
 with students:
     students.insert(db.Student(0, "John", "john@example.com"))
     students.update(("id", 0), db.Student(0, "Johnny", "john@example.com"))
-students.read(("id", 0)) # Student(id=0, name="Johnny", email="john@example.com")
+students.read(("id", 0))  # Student(id=0, name="Johnny", email="john@example.com")
 with students:
     students.delete(("id", 0))
-students.read(("id", 0)) # None
+students.read(("id", 0))  # None
 with courses:
     courses.insert(db.Course("CSC1204", "Programming Principles"))
 with grades:
