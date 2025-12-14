@@ -26,6 +26,8 @@ def create_index(db: Iterable[T], key: str):
     index: Index = {}
     for i, record in enumerate(db):
         if (v := record[key]) in index:
-            raise BadIndex(key, v, record, create_index)
+            err = BadIndex(key, v, record, create_index)
+            err.add_note(f"Column {key} has value `{v}` in {record} at line {i+1}")
+            raise err
         index[v] = i
     return index
