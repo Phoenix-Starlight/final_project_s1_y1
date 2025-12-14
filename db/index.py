@@ -1,5 +1,6 @@
 from typing import Any, Callable, Iterable, TypeVar
 
+from .errors import BadIndex as _BadIndex
 from .schema import Unique
 
 # Maintain a pointer for easy updates
@@ -11,9 +12,8 @@ IndexReference = dict[str, Index]
 # We say that it can be any subtype of Unique
 T = TypeVar("T", bound=Unique, covariant=True)
 
-
 def BadIndex(k, v, obj, keyword: Callable):
-    return ValueError(
+    return _BadIndex(
         f"Bad index `{k}` attempting to {keyword.__name__} `{obj}`: value `{v}` already present`"
     )
 

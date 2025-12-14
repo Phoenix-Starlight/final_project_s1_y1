@@ -12,6 +12,7 @@ from typing import (
     cast,
 )
 
+from .errors import SchemaError
 from .index import BadIndex, IndexReference, T, create_indexes
 from .parser import parse_row, try_parse, validate_table
 from .schema import Course, Grade, Student, Unique, unique_keys
@@ -36,7 +37,7 @@ def load_db[T](
         table = content[1:]
 
         if verify_table_headers(structure, headers):
-            raise ValueError("Bad database format")
+            raise SchemaError("Bad database format")
 
         validate_table(table)
 
@@ -87,7 +88,7 @@ class Database[T: Unique]:
 
     def insert(self, object: T, validate: Callable[[Self, T], None] = _validate):
         if (t := type(object)) is not self.type:
-            raise TypeError(f"{object} of type {t} does not match type {self.type}")
+            raise SchemaError(f"{object} of type {t} does not match type {self.type}")
         validate(self, object)
         self._db.append(object)
         i = len(self._db) - 1
@@ -98,7 +99,7 @@ class Database[T: Unique]:
         if (record := self.read(id)) is None:
             return False
         exceptions = [
-            ValueError(f"Modifying unique column `{f.name}` is disallowed")
+            SchemaError(f"Modifying unique column `{f.name}` is disallowed")
             for f in fields(obj)
             if f.name in self._unique_columns
             if obj[f.name] != record[f.name]
