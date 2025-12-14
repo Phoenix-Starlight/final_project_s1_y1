@@ -1,6 +1,7 @@
 import os
 
-from db import students, Student, courses, Course, grades, Grade
+from db import Student, Course, Grade
+from db.data import students, courses, grades
 from db.schema import letter_grade as grade
 from export import export_course_report, export_student_report
 from reports import generate_student_performance_report, generate_course_summary
