@@ -101,6 +101,7 @@ An external source is kept for unique columns. This can be found in [schema.py](
 It is an error for a unique column to have two rows where they share identical data in a unique column.
 
 A unique column can be used to identify a record. This forms a tuple `(unique_column, id)` used in the `read` function.
+Updating unique columns is forbidden.
 
 # Loading specification
 In order to load a database file we perform the following algorithm:
