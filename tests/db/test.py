@@ -25,6 +25,11 @@ id_identifier = ("id", 0)
 
 class IntegrationTests(unittest.TestCase):
     def setUp(self):
+        self.students = db.data.students()
+        self.courses = db.data.courses()
+        self.grades = db.data.grades()
+
+    def tearDown(self):
         for path in [
             f"{db.data.data_dir}/students.txt",
             f"{db.data.data_dir}/courses.txt",
@@ -34,9 +39,6 @@ class IntegrationTests(unittest.TestCase):
                 Path.unlink(Path(path))
             except FileNotFoundError:
                 pass
-        self.students = db.data.students()
-        self.courses = db.data.courses()
-        self.grades = db.data.grades()
 
 
     def insert_first_record(self):
