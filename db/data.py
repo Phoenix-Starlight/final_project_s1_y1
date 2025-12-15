@@ -2,7 +2,7 @@ from pathlib import Path
 from types import MethodType
 from typing import Callable
 
-from db import Database, Student, Course, Grade
+from db import Database, Student, Course, Grade, SchemaError
 
 data_dir = "data"
 
@@ -40,7 +40,7 @@ def grades() -> Database[Grade]:
             if not student_db.read(("id", id)) or not course_db.read(
                 ("name", course_name)
             ):
-                raise ValueError(
+                raise SchemaError(
                     f"Record {object} does not have respective keys {(student_id, course_name)} present in `students.txt` or `courses.txt`"
                 )
             insert(object)
