@@ -12,7 +12,7 @@ from reports import generate_student_performance_report, generate_course_summary
 def validate_student_details(student_id, name, email):
     try:
         int(student_id)
-        return "@" in email and "." in email
+        return "@" in email and "." in email.split("@")[1]
     except ValueError:
         return False
 
