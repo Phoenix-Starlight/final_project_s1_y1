@@ -52,8 +52,8 @@ def add_new_course():
         print("Invalid Course ID! Should be alphanumeric.")
         return
 
-    if not course_name.isalpha():
-        print("Invalid Course Name! Must use alphabet and not be empty.")
+    if not course_name.isascii():
+        print("Invalid Course Name! Must use ASCII and not be empty.")
 
     with courses() as db:
         course = Course(course_id, course_name)
@@ -137,6 +137,9 @@ def display_course_summary():
 
     course_id = input("Course ID: ").strip()
 
+    if not course_id.isalnum():
+        print("Invalid Course ID! Should be alphanumeric.")
+
     course_db = courses()
 
     course = course_db.read(("id", course_id))
@@ -176,6 +179,14 @@ def export_report():
 
                 if not course_id.isalnum():
                     print("Invalid Course ID! Should be alphanumeric.")
+
+                course_db = courses()
+
+                course = course_db.read(("id", course_id))
+
+                if not course:
+                    print(f"Error: Course ID {course_id} not found!")
+                    return
 
                 return export_course_report(students(), courses(), grades(), None)
             case "3":
