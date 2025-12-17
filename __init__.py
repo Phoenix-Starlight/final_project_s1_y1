@@ -1,13 +1,9 @@
-import os
+from .db import Course, Grade, Student
+from .db.data import courses, grades, students
+from .db.schema import letter_grade as grade
+from .export import export_course_report, export_student_report
+from .reports import generate_course_summary, generate_student_performance_report
 
-from db import Student, Course, Grade
-from db.data import students, courses, grades
-from db.schema import letter_grade as grade
-from export import export_course_report, export_student_report
-from reports import generate_student_performance_report, generate_course_summary
-
-
-# main function
 
 def validate_student_details(student_id, name, email):
     try:
@@ -16,16 +12,19 @@ def validate_student_details(student_id, name, email):
     except ValueError:
         return False
 
+
 def add_new_student():
     print("Option 1: Add New Student")
     print("Input Student Details:\n")
-    
+
     student_id = input("Student ID: ").strip()
     name = input("Name: ").strip()
     email = input("Email: ").strip()
 
     if not validate_student_details(student_id, name, email):
-        print(f"Invalid student details for student id `{student_id}` or email `{email}`")
+        print(
+            f"Invalid student details for student id `{student_id}` or email `{email}`"
+        )
         return
 
     id = int(student_id)
@@ -41,10 +40,11 @@ def add_new_student():
         db.insert(student)
     print(f"Student {name} added successfully!")
 
+
 def add_new_course():
     print("Option 2: Add New Course")
     print("Input Course Details:\n")
-    
+
     course_id = input("Course ID: ").strip()
     course_name = input("Course Name: ").strip()
 
@@ -61,6 +61,7 @@ def add_new_course():
 
     print(f"Course {course_name} added successfully!")
 
+
 def record_student_marks():
     print("Option 3: Record Student Marks")
     print("Select Student and Course\n")
@@ -71,7 +72,6 @@ def record_student_marks():
 
     student_id = input("Student ID: ").strip()
     course_id = input("Course ID: ").strip()
-
 
     try:
         id = int(student_id)
@@ -111,6 +111,7 @@ def record_student_marks():
 
     print(f"Marks recorded successfully! Letter Grade: {letter_grade}")
 
+
 def display_student_performance():
     print("Option 4: Display Student Performance")
     print("Select Student\n")
@@ -129,10 +130,11 @@ def display_student_performance():
 
     print(generate_student_performance_report(students(), courses(), grades(), id))
 
+
 def display_course_summary():
     print("Option 5: Display Course Summary")
     print("Select Course\n")
-    
+
     course_id = input("Course ID: ").strip()
 
     course_db = courses()
@@ -181,11 +183,14 @@ def export_report():
                 break
             case _:
                 print("Invalid selection")
+
+
 # main menu
+
 
 def main():
     print("Student Grading System\n")
-    
+
     while True:
         print("\nMain Menu:")
         print("1. Add New Student")
@@ -195,13 +200,13 @@ def main():
         print("5. Display Course Summary")
         print("6. Export Report")
         print("7. Exit Program")
-        
+
         selection = input("\nPlease Enter Your Selection (1-7): ").strip()
-        
+
         if not selection.isdigit():
             print("Invalid Input! Please enter an integer (1-7).")
             continue
-        
+
         selection = int(selection)
 
         match selection:
@@ -225,5 +230,6 @@ def main():
                 print("Invalid input! Please enter a number between 1 and 7.")
                 continue
 
-if __name__ == "__main__":
-    main()
+
+# Export only main function in wildcard
+__all__ = ["main"]

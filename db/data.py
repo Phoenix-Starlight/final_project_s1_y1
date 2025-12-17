@@ -2,7 +2,7 @@ from pathlib import Path
 from types import MethodType
 from typing import Callable
 
-from db import Database, Student, Course, Grade, SchemaError
+from . import Course, Database, Grade, SchemaError, Student
 
 data_dir = "data"
 

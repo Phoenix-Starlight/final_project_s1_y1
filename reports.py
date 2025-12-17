@@ -1,5 +1,6 @@
 from typing import Iterable
-from db import Grade, Database, Course
+
+from .db import Course, Database, Grade
 
 
 def generate_course_summary(students, courses, grades: Database[Grade], course_name):

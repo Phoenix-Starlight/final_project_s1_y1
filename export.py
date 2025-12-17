@@ -1,4 +1,4 @@
-from reports import generate_course_summary, generate_student_performance_report
+from .reports import generate_course_summary, generate_student_performance_report
 
 
 def export_student_report(students, courses, grades, student_id):
