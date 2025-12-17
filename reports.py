@@ -3,16 +3,21 @@ from typing import Iterable
 from .db import Course, Database, Grade
 
 
-def generate_course_summary(students, courses, grades: Database[Grade], course_name):
+def generate_course_summary(students, courses, grades: Database[Grade], course_id):
     all_scores = [
-        m for g in grades if g.student_id_and_course_name.split("+")[1] == course_name for m in g.marks
+        m for g in grades if g.student_id_and_course_name.split("+")[1] == course_id for m in g.marks
     ]
+
+    course = courses.read(("id", course_id))
+
+    if not course:
+        print(f"No course with this ID {course_id}.")
 
     if not all_scores:
         return "\n".join([
             "======= Course Summary Report =======",
-            f"Course ID  : {courses.read(("name", course_name))}",
-            "Course Name: " + course_name,
+            f"Course ID  : {course.id}",
+            f"Course Name:  {course.name}",
             "------- Student Results -------",
             "====================================="
         ])
@@ -24,8 +29,8 @@ def generate_course_summary(students, courses, grades: Database[Grade], course_n
 
     return "\n".join([
         "======= Course Summary Report =======",
-        f"Course ID  : {courses.read(("name", course_name))}",
-        "Course Name: " + course_name,
+        f"Course ID  : {courses.id}",
+        f"Course Name:  {course.name}",
         "\n------- Student Results -------\n"
     ]
     + [f'{g["student_id"]} - {students.read(("id", g["student_id"]))["name"]}: {g["mark"]} - ({g["letter_grade"]})\n' for g in grades]
