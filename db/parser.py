@@ -20,7 +20,7 @@ def try_parse(cell_data: str, type: Callable[..., Any]):
 
 def parse_array(arr: str, type: Callable[..., Any]) -> list | None:
     if arr[0] == "[" and arr[-1] == "]":
-        if arr[1:-1][-1] == ",":
+        if arr[1:-1][:-2:-1] == ",":
             raise ValueError("Bad array: expected element after ,")
         array = arr[1:-1].split(",")
         # convert array to list[T]
