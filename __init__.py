@@ -6,11 +6,12 @@ from .reports import generate_course_summary, generate_student_performance_repor
 
 
 def validate_student_details(student_id, name, email):
+    bad_id = False
     try:
         int(student_id)
-        return "@" in email and "." in email.split("@")[1] and name
     except ValueError:
-        return False
+        bad_id = True
+    return {"email": "@" in email and "." in email.split("@")[1], "name": bool(name), "id": bad_id}
 
 
 def add_new_student():
@@ -21,10 +22,16 @@ def add_new_student():
     name = input("Name: ").strip()
     email = input("Email: ").strip()
 
-    if not validate_student_details(student_id, name, email):
-        print(
-            f"Invalid student details for student id `{student_id}` or email `{email}`"
-        )
+    if not (validated := validate_student_details(student_id, name, email)):
+        message = []
+        for item in [k for k, v in validated.items() if not v]:
+            match item:
+                case "email":
+                    message.append(f"Invalid email {email}!")
+                case "name":
+                    message.append(f"Invalid name {name}!")
+                case "id":
+                    message.append(f"Invalid ID {student_id}!")
         return
 
     id = int(student_id)
@@ -174,7 +181,8 @@ def export_report():
 
                 if not students().read(("id", id)):
                     print("Student not found, please enter again.")
-                    return False
+                    return
+
                 return export_student_report(students(), courses(), grades(), id)
             case "2":
                 course_id = input("Enter Course ID: ")
