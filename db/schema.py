@@ -53,7 +53,7 @@ def letter_grade(marks: list[int]):
         else:
             return "F"
     except Exception:
-        return ""
+        return "N/A"
 
 
 unique_keys: dict[type, list[str]] = {
