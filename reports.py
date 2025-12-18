@@ -12,6 +12,7 @@ def generate_course_summary(students, courses, grades: Database[Grade], course_i
 
     if not course:
         print(f"No course with this ID {course_id}.")
+        return
 
     if not all_scores:
         return "\n".join([

@@ -8,7 +8,7 @@ from .reports import generate_course_summary, generate_student_performance_repor
 def validate_student_details(student_id, name, email):
     try:
         int(student_id)
-        return "@" in email and "." in email.split("@")[1]
+        return "@" in email and "." in email.split("@")[1] and name
     except ValueError:
         return False
 
@@ -54,6 +54,7 @@ def add_new_course():
 
     if not course_name.isascii():
         print("Invalid Course Name! Must use ASCII and not be empty.")
+        return
 
     with courses() as db:
         course = Course(course_id, course_name)
@@ -139,6 +140,7 @@ def display_course_summary():
 
     if not course_id.isalnum():
         print("Invalid Course ID! Should be alphanumeric.")
+        return
 
     course_db = courses()
 
@@ -179,6 +181,7 @@ def export_report():
 
                 if not course_id.isalnum():
                     print("Invalid Course ID! Should be alphanumeric.")
+                    return
 
                 course_db = courses()
 
