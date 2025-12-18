@@ -1,6 +1,6 @@
 from typing import Any, Callable, Iterable, TypeVar
 
-from .errors import BadIndex as _BadIndex
+from .errors import UniqueError as _UniqueError
 from .schema import Unique
 
 # Maintain a pointer for easy updates
@@ -12,9 +12,9 @@ IndexReference = dict[str, Index]
 # We say that it can be any subtype of Unique
 T = TypeVar("T", bound=Unique, covariant=True)
 
-def BadIndex(k, v, obj, keyword: Callable):
-    return _BadIndex(
-        f"Bad index `{k}` attempting to {keyword.__name__} `{obj}`: value `{v}` already present`"
+def UniqueError(k, v, obj, keyword: Callable):
+    return _UniqueError(
+        f"`Attempting to {keyword.__name__} `{obj}` in index `{k}`: value `{v}` already present`"
     )
 
 
@@ -26,7 +26,7 @@ def create_index(db: Iterable[T], key: str):
     index: Index = {}
     for i, record in enumerate(db):
         if (v := record[key]) in index:
-            err = BadIndex(key, v, record, create_index)
+            err = UniqueError(key, v, record, create_index)
             err.add_note(f"Column {key} has value `{v}` in {record} at line {i+1}")
             raise err
         index[v] = i

@@ -6,7 +6,7 @@ import unittest
 import db
 import db.data
 from db import SchemaError
-from db.errors import BadIndex
+from db.errors import UniqueError
 from db.schema import letter_grade
 
 # Change path to tests (parent of db_test.py) to not contaminate
@@ -77,11 +77,11 @@ class IntegrationTests(unittest.TestCase):
 
     def test_non_unique_insert(self):
         self.test_insert()
-        self.assertRaises(BadIndex, self.insert_non_unique_email)
+        self.assertRaises(UniqueError, self.insert_non_unique_email)
 
     def test_identical_insert(self):
         self.test_insert()
-        self.assertRaises(BadIndex, self.insert_twice)
+        self.assertRaises(UniqueError, self.insert_twice)
 
     def test_updating_unique_key(self):
         self.test_insert()

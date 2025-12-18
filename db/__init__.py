@@ -14,7 +14,7 @@ from typing import (
 from pathlib import Path
 
 from .errors import SchemaError
-from .index import BadIndex, IndexReference, T, create_indexes
+from .index import UniqueError, IndexReference, T, create_indexes
 from .parser import parse_row, try_parse, validate_table
 from .schema import Course, Grade, Student, Unique, unique_keys
 
@@ -56,7 +56,7 @@ def load_db[T](
 def _validate(db, object):
     for k in db._unique_columns:
         if (v := object[k]) in db._index[k]:
-            raise BadIndex(k, v, object, db.insert)
+            raise UniqueError(k, v, object, db.insert)
 
 
 class Database[T: Unique]:
@@ -127,7 +127,7 @@ class Database[T: Unique]:
             if index == -1:
                 index = ref
             elif index != ref:
-                raise BadIndex(id[0], id[1], record, self.delete)
+                raise UniqueError(id[0], id[1], record, self.delete)
             del self._index[k][v]
 
         self._db[index] = None

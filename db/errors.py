@@ -1,7 +1,7 @@
 class DatabaseError(Exception):
     pass
 
-class BadIndex(DatabaseError):
+class UniqueError(DatabaseError):
     pass
 
 class SchemaError(DatabaseError):
