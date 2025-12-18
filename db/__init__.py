@@ -11,6 +11,7 @@ from typing import (
     Type,
     cast,
 )
+from pathlib import Path
 
 from .errors import SchemaError
 from .index import BadIndex, IndexReference, T, create_indexes
@@ -41,22 +42,14 @@ def load_db[T](
 
         validate_table(table)
 
-        for row in table:
-            [
-                try_parse(cell, column_type)
-                for column_type, cell in zip(
-                    [structure[header] for header in headers], parse_row(row)
-                )
-            ]
-
         return [
             constructor(
                 **{
-                    header: try_parse(cell, structure[header])
+                    header: try_parse(cell, structure[header], row_number)
                     for header, cell in zip(headers, parse_row(row))
                 }
             )
-            for row in table
+            for row_number, row in enumerate(table)
         ]
 
 
@@ -75,7 +68,13 @@ class Database[T: Unique]:
         self.file = file
         # CLOSE FILE AFTER OPERATION: DOESN'T UPDATE
         self._initialize_db(file)
-        cold_storage: Sequence[T] = load_db(file, self.type, self.structure)
+
+        try:
+            cold_storage: Sequence[T] = load_db(file, self.type, self.structure)
+        except Exception as e:
+            e.add_note(f"File: {Path(file).absolute()}")
+            raise e
+
         self._db: list[T | None] = list(cold_storage)
         self._unique_columns = unique_keys[self.type]
         self._index: IndexReference = dict(

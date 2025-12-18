@@ -8,14 +8,16 @@ from typing import Any, Callable
 data_regex = r"(\[.*?\])|(.*?)(,|$)"
 
 
-def try_parse(cell_data: str, type: Callable[..., Any]):
+def try_parse(cell_data: str, type: Callable[..., Any], row_number: int) -> list[str]:
     try:
         result = parse_array(cell_data, type) or type(cell_data)
         if result is None:
             raise ValueError()
         return result
     except ValueError as e:
-        raise ValueError(f"Could not parse {cell_data} as `{type}`") from e
+        err = ValueError(f"Could not parse {cell_data} as `{type}`")
+        err.add_note(f"at row {row_number}")
+        raise err from e
 
 
 def parse_array(arr: str, type: Callable[..., Any]) -> list | None:
@@ -41,5 +43,8 @@ def parse_row(datum: str) -> list[str]:
 
 
 def validate_table(table: list[str]):
-    if any(row[-1] == "," for row in table):
-        raise ValueError("Bad database file: expected element after ,")
+    for row_number, row in enumerate(table):
+        if row[-1] == ",":
+            e = ValueError("Bad database file: expected element after ,")
+            e.add_note(f"at row {row_number}")
+            raise e
