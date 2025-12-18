@@ -164,10 +164,10 @@ class Database[T: Unique]:
     def __enter__(self):
         return self
 
-    def __exit__(self, type, _, __):
-        if type:
-            print(f"State of database: {self._db}")
-            return
+    def __exit__(self, t: Type[Exception], exc: Exception, __):
+        if exc:
+            exc.add_note(f"State of database: {self._db}")
+            return False
         # We know this is not None because __exit__ is only called after __enter__
         with open(self.file, "r+") as fd:
             # Empty database
