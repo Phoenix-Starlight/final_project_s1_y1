@@ -57,7 +57,7 @@ def generate_student_performance_report(students, courses: Database[Course], gra
             "======= Student Performance Report =======",
             f"Student ID: {student_id}",
             f"Name      : {students.read(("id", student_id)).name}",
-            f"Email     : {students.read(("id", student_id)).name}",
+            f"Email     : {students.read(("id", student_id)).email}",
             "------- Course & Grades -------",
         ]
         + [
