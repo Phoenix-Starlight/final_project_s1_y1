@@ -9,7 +9,7 @@ from db import SchemaError
 from db.errors import BadIndex
 from db.schema import letter_grade
 
-# Change path to tests/db (parent of test.py) to not contaminate
+# Change path to tests (parent of db_test.py) to not contaminate
 os.chdir(Path(__file__).parent)
 
 test_results: dict[str, bool] = {}
