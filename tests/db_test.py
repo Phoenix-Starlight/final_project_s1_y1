@@ -15,10 +15,10 @@ os.chdir(Path(__file__).parent)
 test_results: dict[str, bool] = {}
 
 class UnitTests(unittest.TestCase):
-    def load_duplicate_data(self):
+    def test_load_duplicate_data(self):
         db.Database("invalid-students.txt", db.Student)
 
-    def load_database(self):
+    def test_load_database(self):
         db.Database("valid-students.txt", db.Student)
 
 id_identifier = ("id", 0)
