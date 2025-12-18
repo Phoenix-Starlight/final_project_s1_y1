@@ -4,13 +4,25 @@ from .db import Course, Database, Grade
 
 
 def generate_course_summary(students, courses, grades: Database[Grade], course_id):
-    all_scores = [
-        m for g in grades if g.student_id_and_course_name.split("+")[1] == course_id for m in g.marks
-    ]
-
     course = courses.read(("id", course_id))
 
-    if not all_scores:
+    student_lines = []
+    averages = []
+
+    for g in grades:
+        student_id, course_name = g.student_id_and_course_name.split("+")
+
+        if course_name != course.name:
+            continue
+
+        student = students.read(("id", int(student_id)))
+        avg = round(get_average(g.marks), 2)
+        averages.append(avg)
+        student_lines.append(
+            f"{student_id} - {student.name}:{g.marks} -  {avg} ({g.letter_grade})"
+        )
+
+    if not student_lines:
         return "\n".join([
             "======= Course Summary Report =======",
             f"Course ID  : {course.id}",
@@ -19,23 +31,18 @@ def generate_course_summary(students, courses, grades: Database[Grade], course_i
             "====================================="
         ])
 
-    averages = [get_average(grade.marks) for grade in grades]
-    average = round(sum(averages) / len(averages), 2)
-    highest = get_highest_mark(averages)
-    lowest = get_lowest_mark(averages)
-
     return "\n".join([
         "======= Course Summary Report =======",
-        f"Course ID  : {courses.id}",
+        f"Course ID  : {course.id}",
         f"Course Name:  {course.name}",
         "\n------- Student Results -------\n"
     ]
-    + [f'{g["student_id"]} - {students.read(("id", g["student_id"]))["name"]}: {g["mark"]} - ({g["letter_grade"]})\n' for g in grades]
+    +student_lines
     + [
         "\n------- Statistics -------\n",
-        f"Average Mark: {average}",
-        f"Highest Mark: {highest}",
-        f"Lowest Mark: {lowest}",
+        f"Average Mark: {round(sum(averages)/len(averages),2)}",
+        f"Highest Mark: {max(averages)}",
+        f"Lowest Mark: {min(averages)}",
         "====================================="
     ])
 
@@ -57,7 +64,7 @@ def generate_student_performance_report(students, courses: Database[Course], gra
             "======= Student Performance Report =======",
             f"Student ID: {student_id}",
             f"Name      : {students.read(("id", student_id)).name}",
-            f"Email     : {students.read(("id", student_id)).name}",
+            f"Email     : {students.read(("id", student_id)).email}",
             "------- Course & Grades -------",
         ]
         + [
