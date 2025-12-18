@@ -199,7 +199,7 @@ def export_report():
                     print(f"Error: Course ID {course_id} not found!")
                     return
 
-                return export_course_report(students(), courses(), grades(), None)
+                return export_course_report(students(), courses(), grades(), course_id)
             case "3":
                 print("Returning to Main Menu")
                 break
@@ -254,4 +254,4 @@ def main():
 
 
 # Export only main function in wildcard
-__all__ = ["main"]
+__all__ = ["main", "tests"]
