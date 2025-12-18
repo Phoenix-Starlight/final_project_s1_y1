@@ -18,7 +18,7 @@ class UnitTests(unittest.TestCase):
     def load_duplicate_data(self):
         db.Database("invalid-students.txt", db.Student)
 
-    def load_database():
+    def load_database(self):
         db.Database("valid-students.txt", db.Student)
 
 id_identifier = ("id", 0)
