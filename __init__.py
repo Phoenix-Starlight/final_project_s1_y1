@@ -238,7 +238,7 @@ def delete_student_marks():
     name = record.name
 
     with grade_db:
-        return grade_db.delete(("id", f"{id}+{name}"))
+        return grade_db.delete(("student_id_and_course_name", f"{id}+{name}"))
 
 def display_student_performance():
     print("Option 7: Display Student Performance")
