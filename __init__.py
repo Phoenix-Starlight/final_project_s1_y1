@@ -220,24 +220,25 @@ def delete_student_marks():
         id = int(student_id)
     except ValueError:
         print("Invalid student ID! Should be a number.")
-        return
+        return True
 
     if not course_id.isalnum():
         print("Invalid Course ID! Should be alphanumeric.")
-        return
+        return True
 
     student = student_db.read(("id", id))
     if not student:
         print(f"Error: Student ID {student_id} not found!")
-        return
+        return False
 
-    course = course_db.read(("name", course_id))
-    if not course:
+    record = course_db.read(("id", id))
+    if not record:
         print(f"Error: Course ID {course_id} not found!")
-        return
+        return False
+    name = record.name
 
     with grade_db:
-        return grade_db.delete(("id", f"{id}+{course_id}"))
+        return grade_db.delete(("id", f"{id}+{name}"))
 
 def display_student_performance():
     print("Option 7: Display Student Performance")
