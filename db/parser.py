@@ -10,7 +10,7 @@ data_regex = r"(\[.*?\])|(.*?)(,|$)"
 
 def try_parse(cell_data: str, type: Callable[..., Any], row_number: int) -> list[str]:
     try:
-        result = parse_array(cell_data, type) or type(cell_data)
+        result = type(cell_data) if (array:= parse_array(cell_data, type)) is None else array
         if result is None:
             raise ValueError()
         return result
@@ -24,6 +24,8 @@ def parse_array(arr: str, type: Callable[..., Any]) -> list | None:
     if arr[0] == "[" and arr[-1] == "]":
         if arr[1:-1][:-2:-1] == ",":
             raise ValueError("Bad array: expected element after ,")
+        if arr == "[]":
+            return []
         array = arr[1:-1].split(",")
         # convert array to list[T]
         if typing.get_origin(type) is not list:

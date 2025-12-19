@@ -16,11 +16,12 @@ def generate_course_summary(students, courses, grades: Database[Grade], course_i
             continue
 
         student = students.read(("id", int(student_id)))
-        avg = round(get_average(g.marks), 2)
-        averages.append(avg)
-        student_lines.append(
+        if g.marks:
+            avg = get_average(g.marks)
+            averages.append(avg)
+            student_lines.append(
             f"{student_id} - {student.name}:{g.marks} -  {avg} ({g.letter_grade})"
-        )
+            )
 
     if not student_lines:
         return "\n".join([
@@ -40,7 +41,7 @@ def generate_course_summary(students, courses, grades: Database[Grade], course_i
     +student_lines
     + [
         "\n------- Statistics -------\n",
-        f"Average Mark: {round(sum(averages)/len(averages),2)}",
+        f"Average Mark: {round(get_average(averages),2)}",
         f"Highest Mark: {get_highest_mark(averages)}",
         f"Lowest Mark: {get_lowest_mark(averages)}",
         "====================================="
@@ -57,6 +58,7 @@ def generate_student_performance_report(students, courses: Database[Course], gra
             f"Email     : {students.read(("id", student_id)).email}",
             "------- Course & Grades -------",
             "==========================================",
+            ""
         ])
 
     return "\n".join(
@@ -68,16 +70,19 @@ def generate_student_performance_report(students, courses: Database[Course], gra
             "------- Course & Grades -------",
         ]
         + [
-            f"{courses.read(("name", course_name)).id} - {course_name}: {g.marks} - {get_average(g.marks)} ({g.letter_grade})"
+            f"{courses.read(("name", course_name)).id} - {course_name}: {g.marks} - {get_average(g.marks) if g.marks else "N/A"} ({g.letter_grade})"
             for g in student_grades
             for student_id, course_name in [tuple(g.student_id_and_course_name.split("+"))]
         ] + [
             "==========================================",
+            ""
         ]
     )
 
 
 def get_average(grades):
+    if grades:
+        return None
     return sum_grades(grades) / len(grades)
 
 
