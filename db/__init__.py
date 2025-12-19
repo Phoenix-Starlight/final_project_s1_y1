@@ -56,7 +56,7 @@ def load_db[T](
 def _validate(db, object):
     for k in db._unique_columns:
         if (v := object[k]) in db._index[k]:
-            raise UniqueError(k, v, object, db.insert)
+            raise UniqueError(k, v, object)
 
 
 class Database[T: Unique]:

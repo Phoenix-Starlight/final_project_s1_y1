@@ -1,8 +1,17 @@
+from db.errors import UniqueError
 from .db import Course, Grade, Student
 from .db.data import courses, grades, students
 from .db.schema import letter_grade as grade
 from .export import export_course_report, export_student_report
 from .reports import generate_course_summary, generate_student_performance_report
+
+def print_on_duplicate_error(func):
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except UniqueError as e:
+            print(f"`{e.record[e.index]}` already exists in column `{e.index}`")
+    return wrapper
 
 
 def validate_student_details(student_id, name, email):
@@ -13,7 +22,7 @@ def validate_student_details(student_id, name, email):
         bad_id = True
     return {"email": "@" in email and "." in email.split("@")[1], "name": bool(name), "id": bad_id}
 
-
+@print_on_duplicate_error
 def add_new_student():
     print("Option 1: Add New Student")
     print("Input Student Details:\n")
@@ -47,7 +56,7 @@ def add_new_student():
         db.insert(student)
     print(f"Student {name} added successfully!")
 
-
+@print_on_duplicate_error
 def add_new_course():
     print("Option 2: Add New Course")
     print("Input Course Details:\n")
@@ -69,7 +78,7 @@ def add_new_course():
 
     print(f"Course {course_name} added successfully!")
 
-
+@print_on_duplicate_error
 def record_student_marks():
     print("Option 3: Record Student Marks")
     print("Select Student and Course\n")

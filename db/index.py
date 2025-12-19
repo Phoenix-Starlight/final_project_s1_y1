@@ -12,9 +12,9 @@ IndexReference = dict[str, Index]
 # We say that it can be any subtype of Unique
 T = TypeVar("T", bound=Unique, covariant=True)
 
-def UniqueError(k, v, obj, keyword: Callable):
+def UniqueError(k, v, obj):
     return _UniqueError(
-        f"`Attempting to {keyword.__name__} `{obj}` in index `{k}`: value `{v}` already present`"
+        f"`Attempting to insert `{obj}` in index `{k}`: value `{v}` already present`", k, obj
     )
 
 
