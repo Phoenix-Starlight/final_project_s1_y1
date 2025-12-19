@@ -1,4 +1,4 @@
-from db.errors import UniqueError, DatabaseError
+from .db.errors import UniqueError, DatabaseError
 from .db import Course, Grade, Student
 from .db.data import courses, grades, students
 from .db.schema import letter_grade as grade
