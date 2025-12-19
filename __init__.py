@@ -139,11 +139,12 @@ def delete_course():
 
     success = True
     with courses() as c, grades() as g:
+        name = c.read(("id", id)).name
         success &= c.delete(("id", id))
         if not success:
             return success
         for marks in g.db:
-            if id in marks.student_id_and_course_name:
+            if name in marks.student_id_and_course_name:
                 success &= g.delete(("student_id_and_course_name", marks.student_id_and_course_name))
         if not success:
             raise DatabaseError()
@@ -227,7 +228,7 @@ def delete_student_marks():
         print(f"Error: Student ID {student_id} not found!")
         return
 
-    course = course_db.read(("id", course_id))
+    course = course_db.read(("name", course_id))
     if not course:
         print(f"Error: Course ID {course_id} not found!")
         return
