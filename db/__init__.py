@@ -122,7 +122,7 @@ class Database[T: Unique]:
 
         index: int = -1
         # Assert our indexes are not mangled and pointing to different records
-        for k, v in entries := {k: record[k] for k in self._unique_columns}.items():
+        for k, v in (entries := {k: record[k] for k in self._unique_columns}.items()):
             ref = self._index[k][v]
             if index == -1:
                 index = ref

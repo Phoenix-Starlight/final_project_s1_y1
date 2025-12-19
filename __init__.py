@@ -11,6 +11,7 @@ def print_on_duplicate_error(func):
             func(*args, **kwargs)
         except UniqueError as e:
             print(f"`{e.record[e.index]}` already exists in column `{e.index}`")
+            input("Press enter to continue...")
     return wrapper
 
 
