@@ -1,4 +1,4 @@
-from db.errors import UniqueError
+from db.errors import UniqueError, DatabaseError
 from .db import Course, Grade, Student
 from .db.data import courses, grades, students
 from .db.schema import letter_grade as grade
@@ -14,6 +14,24 @@ def print_on_duplicate_error(func):
             input("Press enter to continue...")
     return wrapper
 
+def check_delete(delete_func):
+    def wrapper(*args, **kwargs):
+        if not delete_func(*args, **kwargs):
+            print("Deletion unsuccessful: No record(s) matching that ID")
+            input("Press enter to continue...")
+    return wrapper
+
+def confirm_cascade_delete():
+    while True:
+        confirm = input("This will delete all grades associated. Are you sure? (Y/N)")
+
+        match confirm:
+            case "Y" | "y":
+                return True
+            case "N" | "n":
+                return False
+            case _:
+                continue
 
 def validate_student_details(student_id, name, email):
     bad_id = False
@@ -57,6 +75,33 @@ def add_new_student():
         db.insert(student)
     print(f"Student {name} added successfully!")
 
+@check_delete
+def delete_student():
+    print("Option 4: Delete Student")
+    print("Input Student Details:\n")
+
+    student_id = input("Student ID: ").strip()
+
+    try:
+        id = int(student_id)
+    except ValueError:
+        print(f"Invalid ID {student_id}!")
+        return
+
+    confirm_cascade_delete()
+
+    success = True
+    with students() as s, grades() as g:
+        success &= s.delete(("id", id))
+        if not success:
+            return success
+        for marks in g.db:
+            if student_id in marks.student_id_and_course_name:
+                success &= g.delete(("student_id_and_course_name", marks.student_id_and_course_name))
+        if not success:
+            raise DatabaseError()
+        return success
+
 @print_on_duplicate_error
 def add_new_course():
     print("Option 2: Add New Course")
@@ -78,6 +123,31 @@ def add_new_course():
         db.insert(course)
 
     print(f"Course {course_name} added successfully!")
+
+@check_delete
+def delete_course():
+    print("Option 5: Delete Course")
+    print("Input Course Details:\n")
+
+    course_id = input("Course ID: ").strip()
+
+    if not course_id.isalnum():
+        print("Invalid Course ID! Should be alphanumeric.")
+        return
+
+    confirm_cascade_delete()
+
+    success = True
+    with courses() as c, grades() as g:
+        success &= c.delete(("id", id))
+        if not success:
+            return success
+        for marks in g.db:
+            if id in marks.student_id_and_course_name:
+                success &= g.delete(("student_id_and_course_name", marks.student_id_and_course_name))
+        if not success:
+            raise DatabaseError()
+        return success
 
 @print_on_duplicate_error
 def record_student_marks():
@@ -129,9 +199,44 @@ def record_student_marks():
 
     print(f"Marks recorded successfully! Letter Grade: {letter_grade}")
 
+@check_delete
+def delete_student_marks():
+    print("Option 6: Delete Student Marks")
+    print("Select Student\n")
+    print("Select Student and Course\n")
+
+    student_db = students()
+    course_db = courses()
+    grade_db = grades()
+
+    student_id = input("Student ID: ").strip()
+    course_id = input("Course ID: ").strip()
+
+    try:
+        id = int(student_id)
+    except ValueError:
+        print("Invalid student ID! Should be a number.")
+        return
+
+    if not course_id.isalnum():
+        print("Invalid Course ID! Should be alphanumeric.")
+        return
+
+    student = student_db.read(("id", id))
+    if not student:
+        print(f"Error: Student ID {student_id} not found!")
+        return
+
+    course = course_db.read(("id", course_id))
+    if not course:
+        print(f"Error: Course ID {course_id} not found!")
+        return
+
+    with grade_db:
+        return grade_db.delete(("id", f"{id}+{course_id}"))
 
 def display_student_performance():
-    print("Option 4: Display Student Performance")
+    print("Option 7: Display Student Performance")
     print("Select Student\n")
 
     student_id = input("Student ID: ").strip()
@@ -150,7 +255,7 @@ def display_student_performance():
 
 
 def display_course_summary():
-    print("Option 5: Display Course Summary")
+    print("Option 8: Display Course Summary")
     print("Select Course\n")
 
     course_id = input("Course ID: ").strip()
@@ -171,7 +276,7 @@ def display_course_summary():
 
 
 def export_report():
-    print("Option 6: Export Report")
+    print("Option 9: Export Report")
     print("Select Report Type\n")
 
     while True:
@@ -228,15 +333,18 @@ def main():
         print("1. Add New Student")
         print("2. Add New Course")
         print("3. Record Student Marks")
-        print("4. Display Student Performance")
-        print("5. Display Course Summary")
-        print("6. Export Report")
-        print("7. Exit Program")
+        print("4. Delete Student")
+        print("5. Delete Course")
+        print("6. Delete Student Marks")
+        print("7. Display Student Performance")
+        print("8. Display Course Summary")
+        print("9. Export Report")
+        print("10. Exit Program")
 
-        selection = input("\nPlease Enter Your Selection (1-7): ").strip()
+        selection = input("\nPlease Enter Your Selection (1-10): ").strip()
 
         if not selection.isdigit():
-            print("Invalid Input! Please enter an integer (1-7).")
+            print("Invalid Input! Please enter an integer (1-10).")
             continue
 
         selection = int(selection)
@@ -249,13 +357,19 @@ def main():
             case 3:
                 record_student_marks()
             case 4:
-                display_student_performance()
+                delete_student()
             case 5:
-                display_course_summary()
+                delete_course()
             case 6:
-                export_report()
+                delete_student_marks()
             case 7:
-                print("Option 7: Exit Program")
+                display_student_performance()
+            case 8:
+                display_course_summary()
+            case 9:
+                export_report()
+            case 10:
+                print("Option 10: Exit Program")
                 print("Program End.")
                 break
             case _:
