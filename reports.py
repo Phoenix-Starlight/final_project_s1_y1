@@ -81,8 +81,6 @@ def generate_student_performance_report(students, courses: Database[Course], gra
 
 
 def get_average(grades):
-    if grades:
-        return None
     return sum_grades(grades) / len(grades)
 
 
