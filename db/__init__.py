@@ -13,7 +13,7 @@ from typing import (
 )
 from pathlib import Path
 
-from .errors import SchemaError
+from .errors import SchemaError, DatabaseError
 from .index import UniqueError, IndexReference, T, create_indexes
 from .parser import parse_row, try_parse, validate_table
 from .schema import Course, Grade, Student, Unique, unique_keys
@@ -122,12 +122,16 @@ class Database[T: Unique]:
 
         index: int = -1
         # Assert our indexes are not mangled and pointing to different records
-        for k, v in {k: record[k] for k in self._unique_columns}.items():
+        for k, v in entries := {k: record[k] for k in self._unique_columns}.items():
             ref = self._index[k][v]
             if index == -1:
                 index = ref
             elif index != ref:
-                raise UniqueError(id[0], id[1], record, self.delete)
+                error = DatabaseError(f"Mangled indexes while deleting record {record}")
+                error.add_note(f"Inconsistent indexes of record: {
+                {k: {v: self._index[k][v]} for k, v in entries}
+                }")
+                raise error
             del self._index[k][v]
 
         self._db[index] = None
