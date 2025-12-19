@@ -139,7 +139,10 @@ def delete_course():
 
     success = True
     with courses() as c, grades() as g:
-        name = c.read(("id", id)).name
+        record = c.read(("id", id))
+        if not record:
+            return False
+        name = record.name
         success &= c.delete(("id", id))
         if not success:
             return success
