@@ -231,7 +231,7 @@ def delete_student_marks():
         print(f"Error: Student ID {student_id} not found!")
         return False
 
-    record = course_db.read(("id", id))
+    record = course_db.read(("id", course_id))
     if not record:
         print(f"Error: Course ID {course_id} not found!")
         return False
