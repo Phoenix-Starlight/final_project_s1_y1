@@ -41,9 +41,9 @@ def generate_course_summary(students, courses, grades: Database[Grade], course_i
     +student_lines
     + [
         "\n------- Statistics -------\n",
-        f"Average Mark: {round(get_average(averages),2)}",
-        f"Highest Mark: {get_highest_mark(averages)}",
-        f"Lowest Mark: {get_lowest_mark(averages)}",
+        f"Average Mark: {round(get_average(averages),2) if averages else "N/A"}",
+        f"Highest Mark: {get_highest_mark(averages) if averages else "N/A"}",
+        f"Lowest Mark: {get_lowest_mark(averages) if averages else "N/A"}",
         "====================================="
     ])
 
