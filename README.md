@@ -7,7 +7,7 @@ Design, implement, and present a program that manages student records (courses a
 # Progress
 - [x] Flowchart
 - [x] Produce Program
-- [ ] Presentation and Report
+- [x] Presentation and Report
 
 ## Features
 - [x] Exporting results to text files
@@ -18,10 +18,8 @@ Design, implement, and present a program that manages student records (courses a
 # Methodology for Contribution Log
 1. Put work on fork/branch
 2. Open a pull request
-3. Gets accepted and becomes part of the record
+3. Gets accepted
 
 # Branches
 1. [Flowchart](../flow-chart)
 2. [Program](../main)
-
-Presentation will be hosted on Onedrive. A redacted report will be committed here.
